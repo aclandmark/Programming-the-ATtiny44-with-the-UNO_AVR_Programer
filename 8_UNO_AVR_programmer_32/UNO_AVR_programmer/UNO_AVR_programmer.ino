@@ -26,6 +26,7 @@ switch (op_code){
 case 'r': Exit_programming_mode; break;                      //Wait for UNO reset
 case 'R': Verify_Flash_Text();  SW_reset; break;
 case 'e': Prog_EEPROM(); SW_reset; break;
+case 't': set_cal_clock();break;
 
 case 'd':                                                       //Delete contents of the EEPROM
 sendString("\r\nReset EEPROM! D or AOK to escape");             //but leave cal data.
@@ -84,4 +85,21 @@ if(text_started == 3)                                           //Ignore timeout
   inc_w_pointer; store[w_pointer] = 0; }}
 
 
-  
+
+/***************************************************************************************************************************************************/
+void set_cal_clock(void){
+
+sendString("\r\n\r\nSquare wave with 65.536mS period on PB5\r\n");
+UCSR0B &= (~((1 << RXEN0) | (1<< TXEN0)));
+initialise_IO;
+DDRB |= 1 << DDB5;
+PORTB &= (~(1 << PORTB5));                                       //Output low
+TCNT0 = 0;
+TCCR0B = (1 << CS02) | (1 << CS00);                             //7.8125 KHz clock counts to 256 in 32.768mS                    
+
+Reset_H;
+
+while(1){
+while(!(TIFR0 & (1<<TOV0)));
+TIFR0 |= (1<<TOV0);
+PORTB ^= (1 << PORTB5);}}
