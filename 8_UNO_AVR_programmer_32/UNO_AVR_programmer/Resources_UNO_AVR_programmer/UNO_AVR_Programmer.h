@@ -9,7 +9,7 @@ void upload_hex(void);
 void upload_text(void);
 
 void set_up_target_parameters(void);
-
+void set_cal_clock(void);
 
 
 void Clock_period(void){for(int p = 0; p<= 3; p++){asm("nop");}}
