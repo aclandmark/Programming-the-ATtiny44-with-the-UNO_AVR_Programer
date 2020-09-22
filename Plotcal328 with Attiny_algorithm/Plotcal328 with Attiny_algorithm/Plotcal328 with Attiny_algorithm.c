@@ -48,7 +48,7 @@ int main (void)
 	{
 		Timer_T0_sub(T0_delay_5ms);
 		OSCCAL = m;
-		error = compute_error(1,1);
+		error = compute_error(3,1);
 		OSCCAL = OSCCAL_WV;
 		Num_to_PC(10, m); Char_to_PC('\t');
 		Num_to_PC(10, error);
