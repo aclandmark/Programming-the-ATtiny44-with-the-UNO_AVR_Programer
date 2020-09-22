@@ -28,8 +28,8 @@ int main (void)
 	while (OSCCAL>= 0x0F){OSCCAL--;
 		if(!(OSCCAL%2))Tx_data_byte('.');
 		error = compute_error(1,0);
-		if(error < 200) OSCCAL_WV = OSCCAL;
-		if(error < 1000) counter++; else counter =0;
+		if(error < 100) OSCCAL_WV = OSCCAL;
+		if(error < 500) counter++; else counter =0;			//should be < 500 not 1000
 		if (counter == 5)break;	}
 			
 	newline();
@@ -94,7 +94,8 @@ TCCR1B = 0;}
 		if (error_counter < Warmup_counter);
 		else {error_sum = error_sum - 32768 + TCNT1_BKP;}
 		error_counter +=1;}
-	PORTB ^= (1 << PB0);}
+	//PORTB ^= (1 << PB0);
+	}
 
 	
 	
@@ -106,8 +107,8 @@ char Av_counter;
 	TCCR1B = 0;														//Ensure T1 is halted
 	TCNT1 = 0;														//clear Timer 1
 	GIFR |= 1 << PCIF0;												//Clear spurious interrupts
-	DDRB |= 1 << DDB0;
-	PORTB &= (~(1 << PB0));											//Output low
+	//DDRB |= 1 << DDB0;
+	//PORTB &= (~(1 << PB0));											//Output low
 	GIMSK |= 1 << PCIE0;
 	PCMSK0 |= 1 << PCINT4;											//Interrupt on clock pin
 		
