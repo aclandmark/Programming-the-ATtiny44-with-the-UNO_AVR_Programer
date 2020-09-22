@@ -6,7 +6,7 @@
 void Tx_data_byte(unsigned char Txdata){
 	
 	Txdata = ReverseByte(Txdata);
-	Start_96_clock;									//Start clock
+	Start_384_clock;									//Start clock
 		
 	while (!(bit_counter_ovf));							//wait for USI counter overflow
 	bit_counter_ovf = 0;
@@ -26,7 +26,7 @@ void Tx_data_byte(unsigned char Txdata){
 
 void Initialise_USI_Tx (void)
 	{	USICR = 0;										//Reset USI
-		Set_Baud_Rate_96;
+		Set_Baud_Rate_384;
 		TIFR0 = (1 << OCF0A);
 		TCNT0 = 0;
 		TIMSK0 |= (1 << OCIE0A);						//Enable interrupt on output compare
