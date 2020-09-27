@@ -12,6 +12,7 @@ int main (void)
 	
 	setup_Attiny_HW;
 	
+	
 	sei();															//Required by USI (Rx and Tx) and calibration subroutines
 	OSCCAL_DV = OSCCAL;												//Calibrate OSCCAL
 	OSCCAL_WV = OSCCAL;
@@ -33,11 +34,11 @@ int main (void)
 	
 	
 	
-	String_to_USI("\r\nDV/WV OSCCAL values  ");
-	Num_to_PC(10, OSCCAL_DV);  String_to_USI("  "); Num_to_PC(10, OSCCAL_WV);
+	String_to_USI("\r\nDV/WV, previous OSCCAL values  ");
+	Num_to_PC(10, OSCCAL_DV);  String_to_USI("  "); Num_to_PC(10, OSCCAL_WV);String_to_USI("  "); 
+	Num_to_PC(10, eeprom_read_byte((uint8_t*)(EE_size - 2)));
 	newline();
-	
-	
+		
 	counter = 0;
 	for (int m = -15; m <=15; m++)								//Print out results
 	{Timer_T0_sub(T0_delay_5ms);
