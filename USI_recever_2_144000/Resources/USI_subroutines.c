@@ -74,18 +74,22 @@ void String_from_USI (unsigned char* string)						//Receive string from PC
 	USICR = 0;														//Reset USI
 	while(PINA & (1 << PA6));										//wait for start bit
 	fetch_char;														//Detects 1 start bit, 8 data bits and ONE stop bit
-	string[0] = ReverseByte(keypress);
+	string[0] = keypress;
 	for(int n = 1; n <= 45; n++)									//Max permissible string length 44 chars
 	{USICR = 0;														//Reset USI
 	while ((PINA & (1 << PA6)) && (p--));							//Wait for start bit for limited time only 
 		
 	if (!(PINA & (1 << PA6)))										//Start bit detected
 		{fetch_char;
-		string[n] = ReverseByte(keypress);
+		string[n] = keypress;
 		p = 8000;}													//Clear TCNT0
 	
 	else{string[n] = '\0';											//receiver times out: terminate string
 	break;}}
+	
+	for(int n = 0; n <= 45; n++)
+	{if (string[n]){string[n] = ReverseByte(string[n]);}
+		else break;}
 	Initialise_USI_Tx ();}											//Leave USI ready to transmit char
 
 
