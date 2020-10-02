@@ -35,50 +35,68 @@ unsigned int FlashSZ;
 
 unsigned char OSCCAL_DV;
 
-//unsigned char Rx_clock = 55;
-//unsigned char Tx_clock = 67;
+//unsigned char Rx_clock = 90;
+//unsigned char Tx_clock = 90;
 
 /**********************************************************************************************************************/
-///1440: works for polling: Theoretical value is 55
-#define Tx_clock_144000						55
-#define Rx_clock_144000						50
+
+///2560: works for polling: Theoretical value is 31			Tested OK
+#define Tx_clock_256000						33									
+#define Rx_clock_256000						29
+#define Start_clock_256000					TCCR0B = (1 << CS00);
+
+
+
+///144000: works for polling: Theoretical value is 55		Tested OK
+#define Tx_clock_144000						58	
+#define Rx_clock_144000						53
 #define Start_clock_144000					TCCR0B = (1 << CS00);
 
 
-///1280: works for polling: Theoretical value is 62
-#define Tx_clock_128000						62
-#define Rx_clock_128000						57
+
+///128000 works for polling: Theoretical value is 62		Tested OK
+#define Tx_clock_128000						64
+#define Rx_clock_128000						62
 #define Start_clock_128000					TCCR0B = (1 << CS00);
 
 
-///1152: works for polling: Theoretical value is 69
-#define Tx_clock_115200						67							
-#define Rx_clock_115200						63						
+
+///115200: works for polling: Theoretical value is 69		Tested OK
+#define Tx_clock_115200						68					
+#define Rx_clock_115200						66						
 #define Start_clock_115200					TCCR0B = (1 << CS00);
 
 
-#define Set_baud_rate_Tx_76800				85;		
-#define Set_baud_rate_Rx_76800				80;				
+
+///76800: works for polling: Theoretical value is 105		Tested OK
+#define Tx_clock_76800						106			
+#define Rx_clock_76800						102					
 #define Start_clock_76800					TCCR0B = (1 << CS00);
 
-#define Set_baud_rate_Tx_57600				117;	
-#define Set_baud_rate_Rx_57600				112;
+
+
+///57600: works for polling: Theoretical value is 139		Tested OK
+#define Tx_clock_57600						138		
+#define Rx_clock_57600						134	
 #define Start_clock_57600					TCCR0B = (1 << CS00);
 	
-
-///384: works for polling: Theoretical value is 208
-#define Set_baud_rate_Tx_38400				209;					
-#define Set_baud_rate_Rx_38400				204;
+	
+	
+///38400: works for polling: Theoretical value is 208		Tested OK
+#define Tx_clock_38400						210													
+#define Rx_clock_38400						206	
 #define Start_clock_38400					TCCR0B = (1 << CS00);
 
 
-#define Set_baud_rate_Tx_19200				50;	
-#define Set_baud_rate_Rx_19200				45;	
+///19200: works for polling: Theoretical value is 416 (52 x 8)		Tested OK
+#define Tx_clock_19200						52		
+#define Rx_clock_19200						50		
 #define Start_clock_19200					TCCR0B = (1 << CS01);
 
 
-#define Set_baud_rate_Tx_9600				104;	
-#define Set_baud_rate_Rx_9600				100;
+///9600: works for polling: Theoretical value is 833 (104 X 8)		Tested OK
+#define Tx_clock_9600						106		
+#define Rx_clock_9600						102
 #define Start_clock_9600					TCCR0B = (1 << CS01);
 
 
