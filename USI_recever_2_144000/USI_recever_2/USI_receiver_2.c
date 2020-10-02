@@ -27,20 +27,17 @@ PORTA &= (~(1 << PA2));
 /************Get Rx values using LED****************************************/
 
 
-/*while(1){
-	//for (int n = 0; n <= 4; n++){
-	Keypress = Char_from_USI ();
-	//if (Keypress == 'A') {PORTA |= (1 << PA2);  Timer_T1_sub();}
-		Tx_data_byte(Keypress);
-	Rx_clock += 1;
-	}*/
+/*while(1){Keypress = Char_from_USI ();
+	Tx_data_byte(Keypress);
+	Rx_clock += 1;}*/
+	
+	
 
 /************Get Tx values using PC screen****************************************/
-	//while(1){Tx_data_byte('A');
-	/*for (int n = 0; n <= 4; n++){Tx_data_byte('A');
+	/*while(1){Tx_data_byte('A');
 	String_from_USI (char_buffer);
-	//Tx_clock += 1;
-	}*/
+	Tx_clock += 1;}*/
+	
 	
 	set_device_type_and_memory_size;									//confirm device type and set EEPROM size
 	String_to_USI("\r\n\r\nProgram running on ");
