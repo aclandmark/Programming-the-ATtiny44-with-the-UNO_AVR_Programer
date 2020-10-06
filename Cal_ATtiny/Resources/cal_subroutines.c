@@ -43,6 +43,6 @@ eeprom_write_byte((uint8_t*)(EE_size - 3), OSCCAL_DV);}
 /********************************************************************************************************************************/
 void printout_cal_values(void){
 	String_to_USI("\r\nValues saved to EEPROM  ");
-	Num_to_PC(10,eeprom_read_byte((uint8_t*)(EE_size-1))); String_to_USI("  ");
+	Num_to_PC(10,eeprom_read_byte((uint8_t*)(EE_size-3))); String_to_USI("  ");
 	Num_to_PC(10,eeprom_read_byte((uint8_t*)(EE_size-2))); String_to_USI("  ");
-Num_to_PC(10,eeprom_read_byte((uint8_t*)(EE_size-3))); newline();}
+Num_to_PC(10,eeprom_read_byte((uint8_t*)(EE_size-1))); newline();}
