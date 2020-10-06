@@ -12,26 +12,26 @@ int main (void)
 	
 	setup_Attiny_HW;
 	
-	
 	sei();															//Required by USI (Rx and Tx) and calibration subroutines
-	OSCCAL_DV = OSCCAL;												//Calibrate OSCCAL
-	OSCCAL_WV = OSCCAL;
-	OSCCAL_UV = OSCCAL;
+	Char_from_USI(0);												//Pause while Rx/Tx lines are connected
+		
+	OSCCAL_DV = OSCCAL;												//Default OSCCAL
+	OSCCAL_WV = OSCCAL;												//Value automatically selected
+	OSCCAL_UV = OSCCAL;												//Value selected by user
 	OSCCAL = 0xF0;
 	while (OSCCAL>= 0x0F){OSCCAL;
-		if(!(OSCCAL%3))Char_to_USI('.');
-		error = compute_error(1,0);
-		if(error < 500) OSCCAL_WV = OSCCAL;
-		if(error < 1000) counter += 1; else counter =0;				//should be < 500 not 1000
+		if(!(OSCCAL%3))Char_to_USI('.');							//Print . while stepping through OSCCAL values
+		error = compute_error(1,0);									//All error values are positive
+		if(error <1000) OSCCAL_WV = OSCCAL;
+		if(error < 1000) counter += 1; else counter =0;				//Exit for viable value of OSCCAL
 		OSCCAL -= 2;		
 		if (counter == 4)break;	}
 			
 	newline();
-	set_device_type_and_memory_size;
-	String_to_USI("\r\n\r\nCalibrating ");
-	String_to_USI (Device_family[family_ptr]);
+	set_device_type_and_memory_size;								//Confirm device type
+	String_to_USI("\r\n\r\nCalibrating ATtiny");
 	String_to_USI (Device_type[device_ptr]);
-	
+	if (device_ptr == 3)while(1);									//Device not recognized: Halt
 	
 	
 	String_to_USI("\r\nDV/WV, previous OSCCAL values  ");
@@ -40,10 +40,10 @@ int main (void)
 	newline();
 		
 	counter = 0;
-	for (int m = -15; m <=15; m++)								//Print out results
+	for (int m = -15; m <=15; m++)									//Print out results
 	{Timer_T0_sub(T0_delay_5ms);
 		OSCCAL = OSCCAL_WV + m;
-		error = compute_error(1,1);
+		error = compute_error(1,1);									//Signed error values
 		if ((error < -1000) ||
 		(error > 1000))counter = 0; else counter += 1;
 		if(counter == 1)OSCCAL_min = OSCCAL;
@@ -57,7 +57,7 @@ int main (void)
 		
 		String_to_USI("User cal? Enter 1 to F then x if OK\r\n");
 		while(1){
-		if ((Rx_data_byte = Char_from_USI ()) == 'x')break;
+		if ((Rx_data_byte = Char_from_USI (0)) == 'x')break;
 		offset = Rx_data_byte - '1';
 		if(offset > 9)offset -= 7;
 		OSCCAL_UV = OSCCAL_min + offset;
@@ -72,17 +72,23 @@ int main (void)
 
 
 /************************************************************************************************/
-ISR(TIM0_COMPA_vect)												//Clock signal for USI
-{	Set_Baud_Rate_384;
+ISR(TIM0_COMPA_vect)												//Clock signal for USI: shifts data in the USIDataRegister 
+{	
+	//if(DDRA & (1 << DDA5))OCR0A = Tx_clock;							//Transmitter active
+	
+	if(Transmitter_active)OCR0A = Tx_clock;
+	else OCR0A = Rx_clock;											//Necessary because receiver initially sets half the baud rate
 	TCNT0 = 0;}														//Reset T0
 
 
 
 /************************************************************************************************/
-ISR(USI_OVF_vect)
+ISR(USI_OVF_vect)													//USI counter overflows indicating the end of a transmission or reception
 
 {USISR |= (1 << USIOIF);											//Clear USI interrupt flag
-if(DDRA & (1 << DDA5))												//USI transmitter active
+
+if(Transmitter_active)
+//if(DDRA & (1 << DDA5))												//USI transmitter active
 	char_transmitted = 1;
 else
 char_received = 1;}													//USI receiver active			
@@ -91,10 +97,11 @@ char_received = 1;}													//USI receiver active
 
 
 /************************************************************************************************/
-	ISR (PCINT0_vect){
+	ISR (PCI_vector){												//Pin change interrupt on DI pin (PA6)
 		long TCNT1_BKP;
 		
-		if(DDRA & (1 << DDA5)){										//USI transmitter active: Calculate OSCCAL errors
+		if(Transmitter_active){
+		//if(DDRA & (1 << DDA5)){										//USI in default state (transmitter ready): Calculate OSCCAL errors
 		if (!(TCCR1B)) {TCCR1B = (1 << CS11);}						//start T1 counter 1MHz clock
 	else {
 		TCNT1_BKP = TCNT1;
@@ -103,12 +110,14 @@ char_received = 1;}													//USI receiver active
 		else {error_sum = error_sum - 32768 + TCNT1_BKP;}
 		error_counter +=1;}}
 		
-	else{															//USI receiver active
-		{if (!(PINA & (1 << PA6)))									//Low on USI DI pin
+	else{															//USI receiver active: start bit detected
+		{
+			if(DI_pin_low)
+			//if (!(PINA & (1 << PA6)))									//Low on USI DI pin
 			{
 			TCNT0 = 0;
-			Set_half_rate_clock_384;
-			Start_384_clock;										//Start baud rate clock (Half period)
+			OCR0A = Rx_clock/2;
+			Start_clock;											//Start baud rate clock (Half period)
 			TIFR0 = (1 << OCF0A);									//Clear spurious interrupts
 			
 			TIMSK0 |= (1 << OCIE0A);								//Enable interrupt on output compare
@@ -119,7 +128,8 @@ char_received = 1;}													//USI receiver active
 			char_received = 0;
 
 			USISR = 0xF0 | 0x07;									//8 data bits + start bit
-			GIMSK &= (~(1 << PCIE0));								//Disable PCI on DI pin
+			//GIMSK &= (~(1 << PCIE0));								//Disable PCI on DI pin
+			Disable_PCI_on_DI_pin;
 			}}}
 	}
 
