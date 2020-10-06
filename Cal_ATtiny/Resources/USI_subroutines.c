@@ -9,12 +9,12 @@ return x;}
 
 
 
-void Char_to_USI(unsigned char Txdata){
+void Char_to_USI(unsigned char Txdata){					//Transmit data
 	
 	Txdata = ReverseByte(Txdata);
-	Start_384_clock;									//Start clock
+	Start_clock;										//Start T0 running  
 		
-	while (!(char_transmitted));						//wait for USI counter overflow
+	while (!(char_transmitted));						//wait for USI to be initialised
 	char_transmitted = 0;
 	USISR = 0xF0 | (0x10 - 0x05);						//First half of data
 	USIDR = (Txdata >> 2) | 0x80;
@@ -32,19 +32,24 @@ void Char_to_USI(unsigned char Txdata){
 
 void Initialise_USI_Tx (void)
 	{	
-		DDRA &= (!(1 << DDA6));							//Put WPU on PA6 (DI pin)
-		PORTA |= 1 << PA6;
+		//DDRA &= (!(1 << DDA6));							//Put WPU on PA6 (DI pin)
+		//PORTA |= 1 << PA6;
 		
-		USICR = 0;										//Reset USI  EXTRA line
-		Set_Baud_Rate_384;
-		TIFR0 = (1 << OCF0A);							//Clear spurious interrupts
+		WPU_on_DI_pin;
+		
+		USICR = 0;										//Reset USI
+		TCCR0B = 0;										//Ensure that T0 is not running.
+		OCR0A =  Tx_clock;								//Uses Interrupt on T0 compare match
+		TIFR0 = (1 << OCF0A);							//Clear spurious T0 interrupts
 		TCNT0 = 0;										//Clear TCNT0
-		TIMSK0 |= (1 << OCIE0A);						//Enable interrupt on output compare
+		TIMSK0 |= (1 << OCIE0A);						//Enable T0 interrupt on output compare
 		
 		USICR |= ( 1 << USIOIE);						//Enable USI counter interrupt
 		USICR |= (1 << USIWM0);							//Select USI 3-wire mode
 		USICR |= (1 << USICS0);							//Select USI clock source (timer0 compare match)
-		DDRA |= (1 << DDA5);							//Configure DO (PA5) as output
+		//DDRA |= (1 << DDA5);							//Configure DO (PA5) as output high
+		Configure_DO_pin_as_Output
+		
 		USIDR = 0xFF;									//Load USIDR with 0xFF
 		USISR = 0xFF;}									//clear bit counter
 		
@@ -52,21 +57,29 @@ void Initialise_USI_Tx (void)
 
 
 /************************************************************************************************/
-unsigned char Char_from_USI (void)
-{
-	DDRA &= (~((1 << DDA4) | (1 << DDA5) | (1 << DDA6)));				//Set USI IO to WPU
-	PORTA |= (1 << PA4) | (1 << PA5) | (1 << PA6);
-	USICR = 0;															//Reset USI
+
+
+unsigned char Char_from_USI (char timeout)						//zero: wait indefinitively; one wait with timeout
+{int p = 8000;
+	unsigned char keypress;
+	//DDRA &= (~((1 << DDA4) | (1 << DDA5) | (1 << DDA6)));		//Set USI IO to WPU
+	//PORTA |= (1 << PA4) | (1 << PA5) | (1 << PA6);
 	
-	GIFR |= 1 << PCIF0;													//clear spurious interrupts on DI pin
-	GIMSK |= 1 << PCIE0;												//Set PCI on DI pin
+	set_USI_ports_to_WPU;
+	
+	USICR = 0;													//Reset USI
+	
+	GIFR |= 1 << PCIF0;											//clear spurious interrupts on DI pin
+	GIMSK |= 1 << PCIE0;										//Set PCI on DI pin
 	PCMSK0 |= 1 << PCINT6;
 	
-	while(!(char_received));											//Wait for USI overflow ISR
-	char_received = 0;
-	Initialise_USI_Tx ();												//Leave USI ready to transmit char
-return (ReverseByte(USIBR));}											//Take char from buffer register
-
-
-
-
+	if (timeout)
+	while((!(char_received)) && p--);							//Wait for USI overflow ISR
+	else while(!(char_received));
+	if(char_received){
+		char_received = 0;
+	keypress = ReverseByte(USIBR);}
+	else keypress = 0;
+	Initialise_USI_Tx ();										//Leave USI ready to transmit char
+return keypress;}												//Take char from buffer register
+	
