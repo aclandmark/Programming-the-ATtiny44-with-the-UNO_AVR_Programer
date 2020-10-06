@@ -20,8 +20,7 @@
 unsigned char ReverseByte (unsigned char);
 void Initialise_USI_Tx (void);
 void Char_to_USI(unsigned char);
-unsigned char Char_from_USI (void);
-
+unsigned char Char_from_USI (char);
 void String_to_USI(const char*);
 void NumericString_to_PC(unsigned char*);
 void SBtoAL(unsigned char*, long, char);
@@ -50,29 +49,41 @@ unsigned int FlashSZ;
 
 unsigned char OSCCAL_DV;
 
+//unsigned char Rx_clock = 60;
+//unsigned char Tx_clock = 90;
+
+
 /***********************************************************************/
-#define Set_Baud_Rate_1152		OCR0A = 56;
-#define Start_1152_clock		TCCR0B = (1 << CS00);
+///76800: works for polling: Theoretical value is 105	
+#define Tx_clock_76800						78
+#define Rx_clock_76800						74
+#define Start_clock_76800					TCCR0B = (1 << CS00);
 
 
-#define Set_Baud_Rate_768		OCR0A = 90;
-#define Start_768_clock			TCCR0B = (1 << CS00);
-
-#define Set_Baud_Rate_576		OCR0A = 115;
-#define Start_576_clock			TCCR0B = (1 << CS00);
-
-#define Set_Baud_Rate_384		OCR0A = 194;
-#define Set_half_rate_clock_384	OCR0A = 97;
-#define Start_384_clock			TCCR0B = (1 << CS00);
+///57600: works for polling: Theoretical value is 139
+#define Tx_clock_57600						112
+#define Rx_clock_57600						110
+#define Start_clock_57600					TCCR0B = (1 << CS00);
 
 
-#define Set_Baud_Rate_192		OCR0A = 50;
-#define Start_192_clock			TCCR0B = (1 << CS01);
+///38400: works for polling: Theoretical value is 208	
+#define Tx_clock_38400						185	
+#define Rx_clock_38400						185	
+#define Start_clock_38400					TCCR0B = (1 << CS00);
 
 
-#define Set_Baud_Rate_96		OCR0A = 104;
-#define Set_half_rate_clock_96			OCR0A = 52;
-#define Start_96_clock			TCCR0B = (1 << CS01);
+///19200: works for polling: Theoretical value is 416 (52 x 8)	
+#define Tx_clock_19200						48	
+#define Rx_clock_19200						48	
+#define Start_clock_19200					TCCR0B = (1 << CS01);
+
+
+///9600: works for polling: Theoretical value is 833 (104 X 8)		
+#define Tx_clock_9600						100	
+#define Rx_clock_9600						100
+#define Start_clock_9600					TCCR0B = (1 << CS01);
+
+
 
 
 /***********************************************************************/
@@ -103,27 +114,16 @@ DDRB = 0;\
 PORTB = 0x0F;
 
 
-
 /*****************************************************************************/
-const char *Device_type[8], *Device_family[2];
-int device_ptr, family_ptr;
-
+const char *Device_type[4];
+int device_ptr;
 
 /*****************************************************************************/
 #define Set_device_signatures \
-Device_type[0] = "48/P";\
-Device_type[1] = "88/P";\
-Device_type[2] = "168/P";\
-Device_type[3] = "328/P";\
-Device_type[4] = "644";\
-Device_type[5] = "32A";\
-Device_type[6] = "44A";\
-\
-\
-Device_family[0] = "Atmega ";\
-Device_family[1] = "ATtiny ";
-
-
+Device_type[0] = "26/L";\
+Device_type[1] = "44A";\
+Device_type[2] = "84A";\
+Device_type[3] = "? Unknown device! Op halted.";
 
 /*****************************************************************************/
 #define set_device_type_and_memory_size \
@@ -132,35 +132,27 @@ sig_byte_2 = eeprom_read_byte((uint8_t*)(EEP_MAX - 4));\
 sig_byte_3 = eeprom_read_byte((uint8_t*)(EEP_MAX - 5));\
 \
 switch(sig_byte_2){\
-	\
-	case 0x92: FlashSZ = 0x800;  EE_size = 0x100;\
-	switch (sig_byte_3)\
-	{case 0x05: \
-		case 0x0A: device_ptr = 0; family_ptr = 0; break;\
-	case 0x07: device_ptr = 6; family_ptr = 1; break;}\
-	break;\
-	\
-	case 0x93: FlashSZ = 0x1000; EE_size = 0x200;\
-	switch (sig_byte_3)\
-	{case 0x0A:\
-	case 0x0F: device_ptr = 1; family_ptr = 0; break;}\
-	break;\
-	\
-	case 0x94: FlashSZ = 0x2000; EE_size = 0x200;\
-	switch (sig_byte_3)\
-	{case 0x06: \
-	case 0x0B: device_ptr = 2; family_ptr = 0; break;}\
-	break;\
-	\
-	case 0x95: FlashSZ = 0x4000; EE_size = 0x400;\
-	switch (sig_byte_3)\
-	{case 0x14:\
-		case 0x0F: device_ptr = 3; family_ptr = 0; break;\
-	case 0x02: device_ptr = 5; family_ptr = 0; break;}\
-	break;\
-	\
-	case 0x96: FlashSZ = 0x8000; EE_size = 0x800;\
-	switch (sig_byte_3)\
-	{case 0x09: device_ptr = 4; family_ptr = 0; break;}\
-break;}
+\
+case 0x91: FlashSZ = 0x400;  EE_size = 0x80;\
+switch (sig_byte_3)\
+{case 0x09: device_ptr = 0; break;\
+default: device_ptr = 3; break;}\
+break;\
+\
+case 0x92: FlashSZ = 0x800;  EE_size = 0x100;\
+switch (sig_byte_3)\
+{case 0x07: device_ptr = 1; break;\
+default: device_ptr = 3; break;	}\
+break;\
+\
+case 0x93: FlashSZ = 0x1000;  EE_size = 0x200;\
+switch (sig_byte_3)\
+{case 0x0C: device_ptr = 2; break;\
+default: device_ptr = 3; break;	}\
+break;\
+\
+default:  device_ptr = 3;	break;}
+
+
+
 
