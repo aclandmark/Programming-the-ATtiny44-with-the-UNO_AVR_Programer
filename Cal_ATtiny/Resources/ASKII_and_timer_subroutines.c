@@ -13,7 +13,7 @@ void String_to_USI(const char* s){
 /*********************************************************************/
 void Num_to_PC(char radix, long int_num){
 	unsigned char array[12];												//long  has 10 chars + sign + null terminator
-	SBtoAL(array, int_num, radix);								//calls the Binary to askii subroutine
+	SBtoAL(array, int_num, radix);											//calls the Binary to askii subroutine
 NumericString_to_PC(array);}
 
 
