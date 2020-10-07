@@ -32,9 +32,6 @@ void Char_to_USI(unsigned char Txdata){					//Transmit data
 
 void Initialise_USI_Tx (void)
 	{	
-		//DDRA &= (!(1 << DDA6));							//Put WPU on PA6 (DI pin)
-		//PORTA |= 1 << PA6;
-		
 		WPU_on_DI_pin;
 		
 		USICR = 0;										//Reset USI
@@ -47,7 +44,6 @@ void Initialise_USI_Tx (void)
 		USICR |= ( 1 << USIOIE);						//Enable USI counter interrupt
 		USICR |= (1 << USIWM0);							//Select USI 3-wire mode
 		USICR |= (1 << USICS0);							//Select USI clock source (timer0 compare match)
-		//DDRA |= (1 << DDA5);							//Configure DO (PA5) as output high
 		Configure_DO_pin_as_Output
 		
 		USIDR = 0xFF;									//Load USIDR with 0xFF
@@ -62,9 +58,7 @@ void Initialise_USI_Tx (void)
 unsigned char Char_from_USI (char timeout)						//zero: wait indefinitively; one wait with timeout
 {int p = 8000;
 	unsigned char keypress;
-	//DDRA &= (~((1 << DDA4) | (1 << DDA5) | (1 << DDA6)));		//Set USI IO to WPU
-	//PORTA |= (1 << PA4) | (1 << PA5) | (1 << PA6);
-	
+		
 	set_USI_ports_to_WPU;
 	
 	USICR = 0;													//Reset USI
@@ -81,5 +75,5 @@ unsigned char Char_from_USI (char timeout)						//zero: wait indefinitively; one
 	keypress = ReverseByte(USIBR);}
 	else keypress = 0;
 	Initialise_USI_Tx ();										//Leave USI ready to transmit char
-return keypress;}												//Take char from buffer register
+return keypress;}
 	
