@@ -32,12 +32,12 @@ DDRB & (1 << DDB1)
 #define DI_pin_low \
 !(PINB & (1 << PB0))
 
-//#define PCI_vector
-//PCINT0_vect
+#define PCI_vector
+PCINT0_vect
 
 #define Disable_PCI_on_DI_pin \
 GIMSK &= (~(1 << PCIE0));
 
-////#define setup_IO 						//check
-//setup_IO_26
+#define setup_IO 	
+setup_IO_26
 
