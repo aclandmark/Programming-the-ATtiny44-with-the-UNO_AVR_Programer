@@ -1,6 +1,6 @@
 						
 
-#include "Project.h"
+#include "Project_44.h"
 
 int main (void)
 {
@@ -12,7 +12,8 @@ int main (void)
 	
 	setup_Attiny_HW;
 	
-	sei();															//Required by USI (Rx and Tx) and calibration subroutines
+	sei();
+		
 	Char_from_USI(0);												//Pause while Rx/Tx lines are connected
 		
 	OSCCAL_DV = OSCCAL;												//Default OSCCAL
@@ -35,7 +36,8 @@ int main (void)
 	
 	
 	String_to_USI("\r\nDV/WV, previous OSCCAL values  ");
-	Num_to_PC(10, OSCCAL_DV);  String_to_USI("  "); Num_to_PC(10, OSCCAL_WV);String_to_USI("  "); 
+	Num_to_PC(10, OSCCAL_DV);  String_to_USI("  ");
+	Num_to_PC(10, OSCCAL_WV);String_to_USI("  "); 
 	Num_to_PC(10, eeprom_read_byte((uint8_t*)(EE_size - 2)));
 	newline();
 		
@@ -74,8 +76,6 @@ int main (void)
 /************************************************************************************************/
 ISR(TIM0_COMPA_vect)												//Clock signal for USI: shifts data in the USIDataRegister 
 {	
-	//if(DDRA & (1 << DDA5))OCR0A = Tx_clock;							//Transmitter active
-	
 	if(Transmitter_active)OCR0A = Tx_clock;
 	else OCR0A = Rx_clock;											//Necessary because receiver initially sets half the baud rate
 	TCNT0 = 0;}														//Reset T0
@@ -88,7 +88,6 @@ ISR(USI_OVF_vect)													//USI counter overflows indicating the end of a tr
 {USISR |= (1 << USIOIF);											//Clear USI interrupt flag
 
 if(Transmitter_active)
-//if(DDRA & (1 << DDA5))												//USI transmitter active
 	char_transmitted = 1;
 else
 char_received = 1;}													//USI receiver active			
@@ -100,8 +99,7 @@ char_received = 1;}													//USI receiver active
 	ISR (PCI_vector){												//Pin change interrupt on DI pin (PA6)
 		long TCNT1_BKP;
 		
-		if(Transmitter_active){
-		//if(DDRA & (1 << DDA5)){										//USI in default state (transmitter ready): Calculate OSCCAL errors
+		if(Transmitter_active){										//USI in default state (transmitter ready but not in use): Calculate OSCCAL errors
 		if (!(TCCR1B)) {TCCR1B = (1 << CS11);}						//start T1 counter 1MHz clock
 	else {
 		TCNT1_BKP = TCNT1;
@@ -111,11 +109,8 @@ char_received = 1;}													//USI receiver active
 		error_counter +=1;}}
 		
 	else{															//USI receiver active: start bit detected
-		{
 			if(DI_pin_low)
-			//if (!(PINA & (1 << PA6)))									//Low on USI DI pin
-			{
-			TCNT0 = 0;
+			{TCNT0 = 0;
 			OCR0A = Rx_clock/2;
 			Start_clock;											//Start baud rate clock (Half period)
 			TIFR0 = (1 << OCF0A);									//Clear spurious interrupts
@@ -128,9 +123,7 @@ char_received = 1;}													//USI receiver active
 			char_received = 0;
 
 			USISR = 0xF0 | 0x07;									//8 data bits + start bit
-			//GIMSK &= (~(1 << PCIE0));								//Disable PCI on DI pin
-			Disable_PCI_on_DI_pin;
-			}}}
+			Disable_PCI_on_DI_pin;}}
 	}
 
 	
