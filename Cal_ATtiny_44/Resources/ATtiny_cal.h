@@ -5,6 +5,7 @@
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include <avr/eeprom.h>
+#include <avr/pgmspace.h>
 
 
 /***********************************************************************/
@@ -22,6 +23,7 @@ void Initialise_USI_Tx (void);
 void Char_to_USI(unsigned char);
 unsigned char Char_from_USI (char);
 void String_to_USI(const char*);
+void Flash_String_to_USI(const char*);
 void NumericString_to_PC(unsigned char*);
 void SBtoAL(unsigned char*, long, char);
 void Num_to_PC(char, long);
