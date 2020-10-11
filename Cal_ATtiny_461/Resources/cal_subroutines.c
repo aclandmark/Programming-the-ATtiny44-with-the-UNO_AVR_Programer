@@ -8,7 +8,7 @@ long compute_error(char precision, char sign)
 	
 	TCCR1B = 0;															//Ensure T1 is halted
 	TCNT1 = 0;															//clear Timer 1
-	GIFR |= 1 << PCIF;													//Clear spurious interrupts
+	GIFR |= 1 << PCIF0;													//Clear spurious interrupts
 	GIMSK |= 1 << PCIE0;
 	PCMSK0 |= 1 << PCINT4;												//Interrupt on clock pin
 	
