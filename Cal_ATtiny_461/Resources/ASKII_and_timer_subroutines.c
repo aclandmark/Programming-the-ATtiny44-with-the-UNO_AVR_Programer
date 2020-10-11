@@ -60,18 +60,8 @@ void SBtoAL(unsigned char array[], long num, char radix){					//Signed Binary to
 
 		/************************************************************************************************/
 		void Timer_T0_sub(char Counter_speed, unsigned char Start_point){
-			TCNT0L = Start_point;
+			TCNT0 = Start_point;
 			TCCR0B = Counter_speed;
-			while(!(TIFR & (1<<TOV0)));
-		TIFR |= (1<<TOV0); TCCR0B = 0;}
+			while(!(TIFR0 & (1<<TOV0)));
+		TIFR0 |= (1<<TOV0); TCCR0B = 0;}
 
-
-		/************************************************************************************************/
-		/*void Timer_T1_sub(char Counter_speed, unsigned int Start_point){
-			TCNT1H = (Start_point >> 8);
-			TCNT1L = Start_point & 0x00FF;
-			TIFR1 = 0xFF;
-			TCCR1B = Counter_speed;
-			while(!(TIFR1 & (1<<TOV1)));
-			TIFR1 |= (1<<TOV1);
-		TCCR1B = 0;}*/
