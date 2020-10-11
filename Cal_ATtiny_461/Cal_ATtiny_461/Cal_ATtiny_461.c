@@ -1,6 +1,11 @@
 						
+////RESET PRESCALER when starting time/counter???????????????????????????
 
-						#include "Project_461.h"
+
+
+						#include "Project_44.h"
+						
+						volatile unsigned char T1_Overflow_couter;
 
 						int main (void)
 						{
@@ -74,11 +79,11 @@
 
 
 						/************************************************************************************************/
-						ISR(TIMER0_COMPA_vect)												//Clock signal for USI: shifts data in the USIDataRegister
+						ISR(TIM0_COMPA_vect)												//Clock signal for USI: shifts data in the USIDataRegister
 						{
 							if(Transmitter_active)OCR0A = Tx_clock;
 							else OCR0A = Rx_clock;											//Necessary because receiver initially sets half the baud rate
-						TCNT0L = 0;}														//Reset T0
+						TCNT0 = 0;}														//Reset T0
 
 
 
@@ -96,13 +101,15 @@
 
 
 						/************************************************************************************************/
-						ISR (PCI_vector){												//Pin change interrupt on DI pin (PA6)
+						ISR (PCINT0_vect){												//Pin change interrupt on DI pin (PA6)
 							long TCNT1_BKP;
 							
 							if(Transmitter_active){										//USI in default state (transmitter ready but not in use): Calculate OSCCAL errors
-								if (!(TCCR1B)) {TCCR1B = (1 << CS11);}						//start T1 counter 1MHz clock
+								if (!(TCCR1B)) {
+									T1_Overflow_couter = 0;								//Reset T1 counter
+									TCCR1B = (1 << CS11);}								//start T1 counter 1MHz clock
 								else {
-									TCNT1_BKP = TCNT1;
+									TCNT1_BKP = TCNT1 + (T1_Overflow_couter * 0x100);
 									TCNT1 = 0;
 									if (error_counter < Warmup_counter);
 									else {error_sum = error_sum - 32768 + TCNT1_BKP;}
@@ -110,12 +117,12 @@
 								
 								else{															//USI receiver active: start bit detected
 									if(DI_pin_low)
-									{TCNT0L = 0;
+									{TCNT0 = 0;
 										OCR0A = Rx_clock/2;
 										Start_clock;											//Start baud rate clock (Half period)
-										TIFR = (1 << OCF0A);									//Clear spurious interrupts
+										TIFR0 = (1 << OCF0A);									//Clear spurious interrupts
 										
-										TIMSK |= (1 << OCIE0A);								//Enable interrupt on output compare
+										TIMSK0 |= (1 << OCIE0A);								//Enable interrupt on output compare
 										USICR |= ( 1 << USIOIE);								//Enable USI counter interrupt
 										USICR |= (1 << USIWM0);									//Select USI 3-wire mode
 										USICR |= (1 << USICS0);									//Select USI clock source (timer0 compare match)
@@ -128,7 +135,7 @@
 
 								
 								
-
+				ISR(TIMER1_OVF_vect){T1_Overflow_couter++;}
 
 
 
