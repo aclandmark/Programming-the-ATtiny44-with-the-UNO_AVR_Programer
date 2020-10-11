@@ -5,6 +5,7 @@
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include <avr/eeprom.h>
+#include <avr/pgmspace.h>
 
 
 /***********************************************************************/
@@ -28,7 +29,7 @@ void Num_to_PC(char, long);
 long compute_error(char, char);
 
 void Timer_T0_sub(char, unsigned char);
-void Timer_T1_sub(char, unsigned int);
+void Timer_T1_sub(char, unsigned int);///////////////////////////////////
 void Initialise_T0(void);
 
 void save_cal_values(unsigned char );
@@ -49,7 +50,7 @@ unsigned int FlashSZ;
 
 unsigned char OSCCAL_DV;
 
-//unsigned char Rx_clock = 60;
+//unsigned char Rx_clock = 60;						//used to step through OCR0A values to determine optimum setting
 //unsigned char Tx_clock = 90;
 
 
@@ -122,18 +123,21 @@ PORTB = 0xFF;
 
 
 /*****************************************************************************/
-const char *Device_type[4];
+const char *Device_type[8];
 int device_ptr;
 
 
 
 /*****************************************************************************/
 #define Set_device_signatures \
-Device_type[0] = "26/L";\
+Device_type[0] = "24A";\
 Device_type[1] = "44A";\
 Device_type[2] = "84A";\
-Device_type[3] = "? Unknown device! Op halted.";
-
+Device_type[3] = "261A";\
+Device_type[4] = "461A";\
+Device_type[5] = "861A";\
+Device_type[6] = "26/L";\
+Device_type[7] = "? Unknown device! Op halted.";
 
 
 /***************************************************************************************************************/
@@ -146,23 +150,27 @@ switch(sig_byte_2){\
 	\
 	case 0x91: FlashSZ = 0x400;  EE_size = 0x80;\
 	switch (sig_byte_3)\
-	{case 0x09: device_ptr = 0; break;\
-	default: device_ptr = 3; break;}\
+	{case 0x09: device_ptr = 6; break;\
+		case 0x0B: device_ptr = 0; break;\
+		case 0x0C: device_ptr = 3; break;\
+	default: device_ptr = 7; break;}\
 	break;\
 	\
 	case 0x92: FlashSZ = 0x800;  EE_size = 0x100;\
 	switch (sig_byte_3)\
 	{case 0x07: device_ptr = 1; break;\
-	default: device_ptr = 3; break;	}\
+		case 0x08: device_ptr = 4; break;\
+	default: device_ptr = 7; break;	}\
 	break;\
 	\
 	case 0x93: FlashSZ = 0x1000;  EE_size = 0x200;\
 	switch (sig_byte_3)\
 	{case 0x0C: device_ptr = 2; break;\
-	default: device_ptr = 3; break;	}\
+		case 0x0D: device_ptr = 5; break;\
+	default: device_ptr = 7; break;	}\
 	break;\
 	\
-default:  device_ptr = 3;	break;}
+default:  device_ptr = 7;	break;}
 
 
 
