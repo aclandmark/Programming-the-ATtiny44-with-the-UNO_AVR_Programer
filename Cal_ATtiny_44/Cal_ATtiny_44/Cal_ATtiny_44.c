@@ -33,14 +33,12 @@ Program can be used to calibrate ATtiny 44 and 84 devices.  The ATtiny 24 does n
 								
 			newline();
 			set_device_type_and_memory_size;									//Confirm device type
-			/////////////////////String_to_USI("\r\n\r\nCalibrating ATtiny");
+			
 			Flash_String_to_USI(message_1);
 			
 			String_to_USI (Device_type[device_ptr]);
 			if (device_ptr == 7)while(1);										//Device not recognized: Halt
-							
-						
-			/////////////////////String_to_USI("\r\nDV/WV, previous OSCCAL values  ");
+		
 			Flash_String_to_USI(message_2);
 			
 			Num_to_PC(10, OSCCAL_DV);  String_to_USI("  ");
@@ -63,8 +61,7 @@ Program can be used to calibrate ATtiny 44 and 84 devices.  The ATtiny 24 does n
 				Num_to_PC(10, OSCCAL_WV + m); Char_to_USI('\t');
 				Num_to_PC(10, error);
 			newline();}
-							
-			//////////////////////String_to_USI("User cal? Enter 1 to F then x if OK\r\n");
+			
 			Flash_String_to_USI(message_3);
 			
 			
