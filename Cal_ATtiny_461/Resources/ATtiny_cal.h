@@ -102,8 +102,8 @@ Initialise_USI_Tx ();
 #define setup_watchdog \
 wdr();\
 MCUSR &= ~(1<<WDRF);\
-WDTCR |= (1 <<WDCE) | (1<< WDE);\
-WDTCR = 0;
+WDTCSR |= (1 <<WDCE) | (1<< WDE);\
+WDTCSR = 0;
 
 
 #define setup_IO_44 \
@@ -113,11 +113,80 @@ PORTA = 0xFF;\
 DDRB = 0;\
 PORTB = 0x0F;
 
+#define setup_IO_461 \
+MCUCR &= (~(1 << PUD));\
+DDRA = 0;\
+PORTA = 0xFF;\
+DDRB = 0;\
+PORTB = 0xFF;
+
 
 /*****************************************************************************/
 const char *Device_type[4];
 int device_ptr;
 
+
+
+/*****************************************************************************/
+#define Set_device_signatures \
+Device_type[0] = "26/L";\
+Device_type[1] = "44A";\
+Device_type[2] = "84A";\
+Device_type[3] = "? Unknown device! Op halted.";
+
+
+
+/***************************************************************************************************************/
+#define set_device_type_and_memory_size \
+Set_device_signatures;\
+sig_byte_2 = eeprom_read_byte((uint8_t*)(EEP_MAX - 4));\
+sig_byte_3 = eeprom_read_byte((uint8_t*)(EEP_MAX - 5));\
+\
+switch(sig_byte_2){\
+	\
+	case 0x91: FlashSZ = 0x400;  EE_size = 0x80;\
+	switch (sig_byte_3)\
+	{case 0x09: device_ptr = 0; break;\
+	default: device_ptr = 3; break;}\
+	break;\
+	\
+	case 0x92: FlashSZ = 0x800;  EE_size = 0x100;\
+	switch (sig_byte_3)\
+	{case 0x07: device_ptr = 1; break;\
+	default: device_ptr = 3; break;	}\
+	break;\
+	\
+	case 0x93: FlashSZ = 0x1000;  EE_size = 0x200;\
+	switch (sig_byte_3)\
+	{case 0x0C: device_ptr = 2; break;\
+	default: device_ptr = 3; break;	}\
+	break;\
+	\
+default:  device_ptr = 3;	break;}
+
+
+
+
+/***************************************************************************************************************/
+#define WPU_on_DI_pin \
+DDRA &= (!(1 << DI_pin));\
+PORTA |= 1 << DI_pin;
+
+#define Configure_DO_pin_as_Output \
+DDRA |= (1 <<DO_pin);
+
+#define set_USI_ports_to_WPU \
+DDRA &= (~((1 <<USCK_pin) | (1 << DO_pin) | (1 << DI_pin)));\
+PORTA |= (1 <<USCK_pin) | (1 << DO_pin) | (1 <<DI_pin);
+
+#define Transmitter_active \
+DDRA & (1 << DO_pin)
+
+#define DI_pin_low \
+!(PINA & (1 << DI_pin))
+
+#define Disable_PCI_on_DI_pin \
+GIMSK &= (~(1 << PCIE0));
 
 
 
