@@ -8,9 +8,10 @@ void String_to_USI(const char* s){
 	while(i < 200){
 		if(s[i] == '\0') break;
 	Char_to_USI(s[i++]);} }
+	
+	
 
-
-
+/*********************************************************************/
 void Flash_String_to_USI(const char* pFlashStr){
 	int i;
 	for(i = 0; pgm_read_byte(&pFlashStr[i]) && i < 60; i++)
