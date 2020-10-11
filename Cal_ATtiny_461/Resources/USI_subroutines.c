@@ -37,9 +37,9 @@ void Initialise_USI_Tx (void)
 		USICR = 0;										//Reset USI
 		TCCR0B = 0;										//Ensure that T0 is not running.
 		OCR0A =  Tx_clock;								//Uses Interrupt on T0 compare match
-		TIFR = (1 << OCF0A);							//Clear spurious T0 interrupts
-		TCNT0L = 0;										//Clear TCNT0
-		TIMSK |= (1 << OCIE0A);						//Enable T0 interrupt on output compare
+		TIFR0 = (1 << OCF0A);							//Clear spurious T0 interrupts
+		TCNT0 = 0;										//Clear TCNT0
+		TIMSK0 |= (1 << OCIE0A);						//Enable T0 interrupt on output compare
 		
 		USICR |= ( 1 << USIOIE);						//Enable USI counter interrupt
 		USICR |= (1 << USIWM0);							//Select USI 3-wire mode
@@ -63,9 +63,9 @@ unsigned char Char_from_USI (char timeout)						//zero: wait indefinitively; one
 	
 	USICR = 0;													//Reset USI
 	
-	GIFR |= 1 << PCIF;											//clear spurious interrupts on DI pin
+	GIFR |= 1 << PCIF0;											//clear spurious interrupts on DI pin
 	GIMSK |= 1 << PCIE0;										//Set PCI on DI pin
-	PCMSK1 |= 1 << PCINT8;
+	PCMSK0 |= 1 << PCINT6;
 	
 	if (timeout)
 	while((!(char_received)) && p--);							//Wait for USI overflow ISR
