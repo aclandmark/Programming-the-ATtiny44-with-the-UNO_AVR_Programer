@@ -16,7 +16,11 @@
 #define TIMSK0				TIMSK
 #define TIFR1				TIFR
 #define PCINT0_vect			PCINT_vect
+#define PCINT6				PCINT0
 #define TIM0_COMPA_vect		TIMER0_COMPA_vect
+#define DDRA				DDRB
+#define PORTA				PORTB
+#define PINA				PINB
 #define DI_pin				0
 #define DO_pin				1
 #define USCK_pin			2
