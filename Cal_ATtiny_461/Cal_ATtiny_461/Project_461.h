@@ -17,6 +17,7 @@
 #define TIFR1				TIFR
 #define PCINT0_vect			PCINT_vect
 #define PCINT6				PCINT0
+#define PCINT4				PCINT2
 #define TIM0_COMPA_vect		TIMER0_COMPA_vect
 #define DDRA				DDRB
 #define PORTA				PORTB
