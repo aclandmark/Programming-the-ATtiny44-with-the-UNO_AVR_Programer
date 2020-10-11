@@ -33,12 +33,16 @@ Program can be used to calibrate ATtiny 44 and 84 devices.  The ATtiny 24 does n
 								
 			newline();
 			set_device_type_and_memory_size;									//Confirm device type
-			String_to_USI("\r\n\r\nCalibrating ATtiny");
+			/////////////////////String_to_USI("\r\n\r\nCalibrating ATtiny");
+			Flash_String_to_USI(message_1);
+			
 			String_to_USI (Device_type[device_ptr]);
 			if (device_ptr == 7)while(1);										//Device not recognized: Halt
 							
 						
-			String_to_USI("\r\nDV/WV, previous OSCCAL values  ");
+			/////////////////////String_to_USI("\r\nDV/WV, previous OSCCAL values  ");
+			Flash_String_to_USI(message_2);
+			
 			Num_to_PC(10, OSCCAL_DV);  String_to_USI("  ");
 			Num_to_PC(10, OSCCAL_WV);String_to_USI("  ");
 			Num_to_PC(10, eeprom_read_byte((uint8_t*)(EE_size - 2)));
@@ -60,7 +64,10 @@ Program can be used to calibrate ATtiny 44 and 84 devices.  The ATtiny 24 does n
 				Num_to_PC(10, error);
 			newline();}
 							
-			String_to_USI("User cal? Enter 1 to F then x if OK\r\n");
+			//////////////////////String_to_USI("User cal? Enter 1 to F then x if OK\r\n");
+			Flash_String_to_USI(message_3);
+			
+			
 			while(1){
 				if ((Rx_data_byte = Char_from_USI (0)) == 'x')break;
 				offset = Rx_data_byte - '1';
@@ -68,7 +75,7 @@ Program can be used to calibrate ATtiny 44 and 84 devices.  The ATtiny 24 does n
 				OSCCAL_UV = OSCCAL_min + offset;
 				Num_to_PC(10, OSCCAL_UV);
 				newline();
-			}
+				}
 			save_cal_values(OSCCAL_UV);
 			printout_cal_values();
 			while(1);
