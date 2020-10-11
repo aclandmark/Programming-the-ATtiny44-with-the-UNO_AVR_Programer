@@ -10,6 +10,16 @@ void String_to_USI(const char* s){
 	Char_to_USI(s[i++]);} }
 
 
+
+void Flash_String_to_USI(const char* pFlashStr){
+	int i;
+	for(i = 0; pgm_read_byte(&pFlashStr[i]) && i < 60; i++)
+Char_to_USI(pgm_read_byte(&pFlashStr[i]));}
+
+
+
+
+
 /*********************************************************************/
 void Num_to_PC(char radix, long int_num){
 	unsigned char array[12];												//long  has 10 chars + sign + null terminator
