@@ -1,2 +1,4 @@
-Starting off with the ATtiny programmer
-Test text
+UNO_ARV_Programer was developed to enable the UNO to program the Atmega 328 family of devices, the Atmega644 and the Atmega32.  This gives the user access to 28 pin and 
+40 pin devices with flash memory sizes betwwen 2 and 64kBytes.
+Attiny devices are very important, they have less pins, a smaller footprint are cheeper and can supply more current per pin.  Version 2 of the programmer gives access to 
+two families of Attiny devices: The Attiny 261, 461, 861 witrh 20 pins and up tro 8KBytes of flash and the ATtiny 24, 44, 84 with similar amounts of memory and 14 pins.
