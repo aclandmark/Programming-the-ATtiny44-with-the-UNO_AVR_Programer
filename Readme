@@ -1,2 +1,19 @@
-Starting off with the ATtiny programmer
-Test text
+UNO_ARV_Programer was developed (see repository PCB111000_1) to enable the UNO to program the Atmega 328 family of devices, the Atmega644 and the Atmega32.  
+This gives the user access to 28 pin and 40 pin devices with flash memory sizes betwwen 2 and 64kBytes.
+
+Attiny devices are also very important, they have less pins, a smaller footprint are cheeper and can supply more current per pin.  
+Version 2 of the programmer gives access to two families of Attiny devices: The Attiny 261, 461, 861 with 20 pins and up to 8KBytes of flash
+and the ATtiny 24, 44, 84 with similar amounts of memory and 14 pins.
+
+However none of these devices has ports for an independent watch crystal (usually used with timer 2) or a UART.  The internal RC clock is 
+calibrated using a signal suplied by the UNO and placed on the programming clock pin.  THe UART function is supplied by a Universal sereial interface (USI). 
+This can be configured as a UART, I2C or SPI depending upon the code used to control it.
+
+Atmel provide code for the UART application.  A timer zero interrupt provides the signal to clock the data in and out.  However significant delays are 
+introduced by the interrup and actual timer delay is less than that obtained using simple calculation.  Here it has been obtained by trial and error 
+and the maximun baud rate was found to be 78600.
+
+A second implementation has therefore also been developed.  In this case all interrupts are replaced by polling.  In many cases the calculated values 
+of trimer delay can be used and with care a baud rate of 256000 can be obtained.
+The obvious dissadvantage is that when receiving or transmiting data no other proces can be goining on between the interrupts.  It is considered that for a 
+device such as the ATtiny this will rarely be a dissadvantage for many users (certainly not for the author of this posting).
