@@ -44,7 +44,7 @@ void Initialise_USI_Tx (void)
 		USICR |= ( 1 << USIOIE);						//Enable USI counter interrupt
 		USICR |= (1 << USIWM0);							//Select USI 3-wire mode
 		USICR |= (1 << USICS0);							//Select USI clock source (timer0 compare match)
-		Configure_DO_pin_as_Output
+		Configure_DO_pin_as_Output;
 		
 		USIDR = 0xFF;									//Load USIDR with 0xFF
 		USISR = 0xFF;}									//clear bit counter
@@ -65,7 +65,7 @@ unsigned char Char_from_USI (char timeout)						//zero: wait indefinitively; one
 	
 	GIFR |= 1 << PCIF0;											//clear spurious interrupts on DI pin
 	GIMSK |= 1 << PCIE0;										//Set PCI on DI pin
-	PCMSK0 |= 1 << PCINT6;
+	//PCMSK0 |= 1 << PCINT6;//8
 	
 	if (timeout)
 	while((!(char_received)) && p--);							//Wait for USI overflow ISR
