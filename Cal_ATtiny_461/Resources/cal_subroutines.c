@@ -2,31 +2,28 @@
 
 
 /************************************************************************************************/
-long compute_error(char precision, char sign)
+long compute_error(char Num_Av, char sign)
 {long error;
-	char Av_counter;
 	
+	error_sum = 0;
+	int_counter = 0;													//Initialise all registers
+	TCNT1_sum = 0;
 	TCCR1B = 0;															//Ensure T1 is halted
 	TCNT1 = 0;															//clear Timer 1
 	GIFR |= 1 << PCIF0;													//Clear spurious interrupts
-	GIMSK |= 1 << PCIE0;
-	PCMSK0 |= 1 << PCINT4;												//Interrupt on clock pin
+	GIMSK |= 1 << PCIE0;												//Set Pin change interrupt
+	PCMSK1 |= 1 << PCINT10;												//Pin PB2 the clock input pin
+	TIMSK |= (1 << TOIE1);												//Set timer 1 interrupt on overflow
 	
-	if (precision == 1){Warmup_counter = 1; Av_counter = 1;}			//Num_2: av_counter	Num_1: Total counter
-	if (precision == 2){Warmup_counter = 2; Av_counter = 4;}
-	if (precision == 3){Warmup_counter = 5; Av_counter = 10;}
+	while (int_counter < Num_Av);										//Pause here for interrupts: Average the result over several 32.768mS periods
+	GIMSK &= (~(1 << PCIE0));											//Measurement complete: Reset registers
+	while (GIMSK & (1 << PCIE0));										//Disable PCI
+	TIMSK &= (~(1 << TOIE1));											//Disable Timer 1 interrupt
 	
-	error_counter = 0;													//Compute error for each value of OSCCAL 10 times
-	error_sum = 0;
-	while(error_counter < (Warmup_counter + Av_counter));				//Wait here while error is calculated
-	
-	error_counter = 0;
-	error = error_sum;
-	if ((!sign) && (error < 0)) error *= (-1);
-	GIMSK &= (~(1 << PCIE0));											//halt interrupts
-	PCMSK0 &= (~(1 << PCINT4));
-	
-return error/Av_counter;}
+	error = error_sum/Num_Av;											//Obtain average result
+	if ((sign) && error < 0) error = error * (-1);						//Set sign if required
+	return error;
+	}
 
 
 
