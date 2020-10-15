@@ -19,9 +19,9 @@
 #define PCINT6				PCINT0
 #define PCINT4				PCINT2
 #define TIM0_COMPA_vect		TIMER0_COMPA_vect
-#define DDRA				DDRB
-#define PORTA				PORTB
-#define PINA				PINB
+//#define DDRA				DDRB
+//#define PORTA				PORTB
+//#define PINA				PINB
 #define DI_pin				0
 #define DO_pin				1
 #define USCK_pin			2
