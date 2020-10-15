@@ -39,11 +39,16 @@ void printout_cal_values(void);
 /***********************************************************************/
 unsigned char Txdata;
 volatile long error_sum;
-volatile unsigned char error_counter;
-volatile char Warmup_counter;
+//volatile unsigned char error_counter;
+//volatile char Warmup_counter;
 volatile char char_transmitted;
 volatile char char_received;
+//volatile long T1_Overflow_couter;
+//volatile long T1_Overflow_couter_BKP;
+volatile long TCNT1_sum;
+volatile char int_counter;
 
+  
 int sig_byte_2, sig_byte_3;
 int EE_size;
 unsigned int FlashSZ;
@@ -177,21 +182,22 @@ default:  device_ptr = 7;	break;}
 
 /***************************************************************************************************************/
 #define WPU_on_DI_pin \
-DDRA &= (!(1 << DI_pin));\
-PORTA |= 1 << DI_pin;
+DDRB &= (!(1 << DI_pin));\
+PORTB |= 1 << DI_pin;
 
 #define Configure_DO_pin_as_Output \
-DDRA |= (1 <<DO_pin);
+DDRB |= (1 <<DO_pin);
+
 
 #define set_USI_ports_to_WPU \
-DDRA &= (~((1 <<USCK_pin) | (1 << DO_pin) | (1 << DI_pin)));\
-PORTA |= (1 <<USCK_pin) | (1 << DO_pin) | (1 <<DI_pin);
+DDRB &= (~((1 <<USCK_pin) | (1 << DO_pin) | (1 << DI_pin)));\
+PORTB |= (1 <<USCK_pin) | (1 << DO_pin) | (1 <<DI_pin);
 
 #define Transmitter_active \
-DDRA & (1 << DO_pin)
+DDRB & (1 << DO_pin)
 
 #define DI_pin_low \
-!(PINA & (1 << DI_pin))
+!(PINB & (1 << DI_pin))
 
 #define Disable_PCI_on_DI_pin \
 GIMSK &= (~(1 << PCIE0));
