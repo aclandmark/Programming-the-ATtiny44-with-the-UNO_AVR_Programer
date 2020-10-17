@@ -2,16 +2,21 @@
 /*
 Program designed to calibrate the ATtiny  44 and 84 461 and 861 devices.
 "UNO_AVR_Programmer_V2" code running on the UNO is used to program the ATtiny devices.
-A 65.536mS square wave on the UNO clock programming pin is used to calibrate the devices.
+A 65.536mS square wave on the UNO clock programming pin is used to calibrate them.
 
 The ATtiny devices come with a Universal Serial Interface in place of the more usual UART.  
 The USI routines used in this project are taken from Atmel Application note AVR307 and the accompanying
 source code.  See http://becomingmaker.com/usi-serial-uart-attiny85/ for the links.
 (Note: The author of this web page is also an Osborne, a different Osborne however from the one posting this project).   
  
-A cut down version could be used to program the 24 and 261 versions
+While the target device is being programmed its USI Rx/Tx lines must be temporarily disconnected.
+They must then be reconnected as user input is required to complete the calibration process.
 
-Note The Project.h file contains two sections, one for the 44 family and one for the 461 family.   
+Cut and paste could be used to developed cut down versions of this program that would run faster and 
+more efficiently and even do without user input. Such a version could be  could be used to program 24 and 261 devices
+
+The Project.h file contains two sections, one for the 44 family and one for the 461 family.   
+
 */
 
 
@@ -30,7 +35,6 @@ int main (void)
 	
 	setup_Attiny_HW;
 	
-	//OCR1A = 0xFF;														//Timer 1 interrupt generated when timer counts to 255
 	sei();																//Required by USI and cal subroutines
 	
 	Char_from_USI(0);													//Pause while Rx/Tx lines are connected
