@@ -1,7 +1,7 @@
 
 
 
-//Baud rate set for 38400: replace 38400 with wanted baud rate
+//Baud rate set for 38400: replace 38400 with wanted baud rate (Application only not the programmer)
 
 #define Tx_clock						Tx_clock_38400
 #define Rx_clock						Rx_clock_38400
@@ -9,7 +9,7 @@
 
 
 
-/******Use these definitions for the ATtiny 461 familay of devices*********
+/******Use these definitions for the ATtiny 461 familay of devices*********/
 
 #define	TCNT0						TCNT0L
 #define	TIFR0						TIFR
@@ -27,7 +27,7 @@
 #define set_PCI_mask_on_DI			PCMSK1	= (1 << PCINT8)
 #define clear_PCI_mask_on_DI		PCMSK1	&= (~(1 << PCINT8))
 
-#define prescaller_setting			44
+#define prescaller_setting			0x44
 
 #define DI_pin						0
 #define DO_pin						1
@@ -36,11 +36,11 @@
 #define DDR_USI						DDRB
 #define PIN_USI						PINB
 #define PORT_USI					PORTB
-***************************************************************************/
+/***************************************************************************/
 
 
 
-/******Use these definitions for the ATtiny 44 familay of devices*********/
+/******Use these definitions for the ATtiny 44 familay of devices*********
 
 #define set_PCI_mask_on_SCL			PCMSK0	= (1 << PCINT4)
 #define clear_PCI_mask_on_SCL		PCMSK0 &= (~(1 << PCINT4))
@@ -57,7 +57,7 @@
 #define DDR_USI						DDRA
 #define PIN_USI						PINA
 #define PORT_USI					PORTA
-/*******************************************************************************/
+*******************************************************************************/
 
 
 
