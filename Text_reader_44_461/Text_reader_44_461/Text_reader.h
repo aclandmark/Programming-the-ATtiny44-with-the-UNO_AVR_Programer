@@ -60,12 +60,9 @@
 *******************************************************************************/
 
 
-
-#include "../Resources/ATtiny_cal.h"
-#include "../Resources/USI_subroutines.c"
-#include "../Resources/ASKII_and_timer_subroutines.c"
-#include "../Resources/cal_subroutines.c"
-
+#include "..\Resources\Text_reader.h"
+#include "..\Resources\Basic_IO_subs.c"
+#include "..\Resources\USI_subroutines.c"
 
 /*
 const char message_1[] PROGMEM = {"\r\n\r\nCalibrating ATtiny"};
