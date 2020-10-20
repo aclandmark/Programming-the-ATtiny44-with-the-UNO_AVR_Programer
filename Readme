@@ -14,6 +14,6 @@ introduced by the interrup and actual timer delay is less than that obtained usi
 and the maximun baud rate was found to be 78600.
 
 A second implementation has therefore also been developed.  In this case all interrupts are replaced by polling.  In many cases the calculated values 
-of trimer delay can be used and with care a baud rate of 256000 can be obtained.
+of timer delay can be used and with care a baud rate of 256000 can be obtained.
 The obvious dissadvantage is that when receiving or transmiting data no other proces can be goining on between the interrupts.  It is considered that for a 
 device such as the ATtiny this will rarely be a dissadvantage for many users (certainly not for the author of this posting).
