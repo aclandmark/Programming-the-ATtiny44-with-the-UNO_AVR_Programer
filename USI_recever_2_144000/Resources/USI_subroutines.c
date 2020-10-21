@@ -10,15 +10,17 @@ return x;}
 
 /**************************************************************************************************************/
 void Initialise_USI_Tx (void)
-{DDRA &= (!(1 << DDA6));							//Put WPU on PA6 (DI pin)
-	PORTA |= 1 << PA6;
-	
+{	//DDRA &= (!(1 << DDA6));							//Put WPU on PA6 (DI pin)
+	//PORTA |= 1 << PA6;
+	WPU_on_DI_pin;
 	USICR = 0;										//Reset USI
+	TCCR0B = 0;
 	OCR0A = Tx_clock;
 	TIFR0 = (1 << OCF0A);							//Clear spurious interrupts
 	TCNT0 = 0;										//Clear TCNT0
 	USICR |= (1 << USIWM0);							//Select USI 3-wire mode
-	DDRA |= (1 << DDA5);							//Configure DO (PA5) as output
+	//DDRA |= (1 << DDA5);							//Configure DO (PA5) as output
+	Configure_DO_pin_as_Output;
 	USIDR = 0xFF;									//Load USIDR with 0xFF
 USISR = 0xFF;}										//Clear spurious interrupt flags
 
@@ -48,11 +50,14 @@ void Tx_data_byte(unsigned char Txdata){				//USI already initialised for transm
 unsigned char Char_from_USI (void)									//Receive char
 {unsigned char keypress;
 	
-	DDRA &= (~((1 << DDA4) | (1 << DDA5) | (1 << DDA6)));			//Set USI IO to WPU
-	PORTA |= (1 << PA4) | (1 << PA5) | (1 << PA6);
+	//DDRA &= (~((1 << DDA4) | (1 << DDA5) | (1 << DDA6)));			//Set USI IO to WPU
+	//PORTA |= (1 << PA4) | (1 << PA5) | (1 << PA6);
+	set_USI_ports_to_WPU;
+	
 	USICR = 0;														//Reset USI
 	
-	while(PINA & (1 << PA6));										//wait for start bit
+	//while(PINA & (1 << PA6));										//wait for start bit
+	while (!(start_bit));
 	
 	fetch_char;	
 	keypress = ReverseByte(keypress);
@@ -68,18 +73,25 @@ void String_from_USI (unsigned char* string)						//Receive string from PC
 { int p = 8000;
 	unsigned char keypress;
 	
-	DDRA &= (~((1 << DDA4) | (1 << DDA5) | (1 << DDA6)));			//Set USI IO to WPU
-	PORTA |= (1 << PA4) | (1 << PA5) | (1 << PA6);
+	//DDRA &= (~((1 << DDA4) | (1 << DDA5) | (1 << DDA6)));			//Set USI IO to WPU
+	//PORTA |= (1 << PA4) | (1 << PA5) | (1 << PA6);
+	set_USI_ports_to_WPU;
 	
 	USICR = 0;														//Reset USI
-	while(PINA & (1 << PA6));										//wait for start bit
+	//while(PINA & (1 << PA6));										//wait for start bit
+	while (!(start_bit));
+	
 	fetch_char;														//Detects 1 start bit, 8 data bits and ONE stop bit
 	string[0] = keypress;
 	for(int n = 1; n <= 45; n++)									//Max permissible string length 44 chars
 	{USICR = 0;														//Reset USI
-	while ((PINA & (1 << PA6)) && (p--));							//Wait for start bit for limited time only 
-		
-	if (!(PINA & (1 << PA6)))										//Start bit detected
+	//while ((PINA & (1 << PA6)) && (p--));							//Wait for start bit for limited time only 
+	while 	((!(start_bit)) && (p--));
+	
+	
+	//if (!(PINA & (1 << PA6)))										//Start bit detected
+	if(start_bit)
+	
 		{fetch_char;
 		string[n] = keypress;
 		p = 8000;}													//Clear TCNT0
