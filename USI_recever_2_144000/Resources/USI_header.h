@@ -137,6 +137,20 @@ set_device_type_and_memory_size;\
 Initialise_USI_Tx ();\
 cal_device;
 
+#define setup_IO_44 \
+MCUCR &= (~(1 << PUD));\
+DDRA = 0;\
+PORTA = 0xFF;\
+DDRB = 0;\
+PORTB = 0x0F;
+
+#define setup_IO_461 \
+MCUCR &= (~(1 << PUD));\
+DDRA = 0;\
+PORTA = 0xFF;\
+DDRB = 0;\
+PORTB = 0xFF;
+
 
 
 /***********************************************************************/
@@ -147,15 +161,6 @@ wdr();\
 MCUSR &= ~(1<<WDRF);\
 WDTCSR |= (1 <<WDCE) | (1<< WDE);\
 WDTCSR = 0;
-
-
-#define setup_IO \
-MCUCR &= (~(1 << PUD));\
-DDRA = 0;\
-PORTA = 0xFF;\
-DDRB = 0;\
-PORTB = 0x0F;
-
 
 
 #define cal_device \
