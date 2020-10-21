@@ -16,8 +16,8 @@ int main (void)
 		
 setup_ATtiny_HW;													//Configures USI as a transmitter
 
-DDRA |= 1 << DDA2;
-PORTA &= (~(1 << PA2));
+//DDRA |= 1 << DDA2;
+//PORTA &= (~(1 << PA2));
 
 	//sei();
 	//String_from_USI (char_buffer);									//Wait while user changes baud rate if required
@@ -67,10 +67,10 @@ PORTA &= (~(1 << PA2));
 	
 	
 /************************************************************************************************/
-void Timer_T1_sub(void){
+/*void Timer_T1_sub(void){
 	TCNT1 = 0xF0BE;
 	TIFR1 = 0xFF;
 	TCCR1B = 5;
 	while(!(TIFR1 & (1<<TOV1))){if (TCNT1 >= 0xF85F)PORTA &= (~(1 << PA2));}
 	TIFR1 |= (1<<TOV1);
-TCCR1B = 0;}
+TCCR1B = 0;}*/
