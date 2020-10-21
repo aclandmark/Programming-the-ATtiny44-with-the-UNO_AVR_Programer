@@ -9,7 +9,7 @@
 
 
 
-/******Use these definitions for the ATtiny 461 familay of devices*********
+/******Use these definitions for the ATtiny 461 familay of devices*********/
 
 #define	TCNT0						TCNT0L
 #define	TIFR0						TIFR
@@ -36,11 +36,11 @@
 #define DDR_USI						DDRB
 #define PIN_USI						PINB
 #define PORT_USI					PORTB
-***************************************************************************/
+/***************************************************************************/
 
 
 
-/******Use these definitions for the ATtiny 44 familay of devices*********/
+/******Use these definitions for the ATtiny 44 familay of devices*********
 
 #define set_PCI_mask_on_SCL			PCMSK0	= (1 << PCINT4)
 #define clear_PCI_mask_on_SCL		PCMSK0 &= (~(1 << PCINT4))
@@ -57,7 +57,7 @@
 #define DDR_USI						DDRA
 #define PIN_USI						PINA
 #define PORT_USI					PORTA
-/*******************************************************************************/
+*******************************************************************************/
 
 
 
