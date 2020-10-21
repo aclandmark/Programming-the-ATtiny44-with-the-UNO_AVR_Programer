@@ -2,10 +2,7 @@
 
 
 #include "Project.h"
-void USART_init (unsigned char, unsigned char);
-void Timer_T0_sub(char, unsigned char);
-#define T0_delay_10ms 5,183
-#define T0_delay_5ms 5,220
+
 
 int main (void)
 {
