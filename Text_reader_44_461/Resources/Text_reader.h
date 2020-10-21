@@ -79,7 +79,7 @@ volatile char char_received;
 /**********************************************************************************/
 #define setup_HW \
 setup_watchdog;\
-Initialise_IO;\
+setup_IO;\
 set_device_type_and_memory_size;\
 cal_device;\
 Initialise_USI_Tx ();
@@ -139,8 +139,6 @@ if((User_response == 'R') || (User_response == 'r'))break;} String_to_USI("\r\n"
 
 
 /*****************************************************************************/
-const char *Device_type[4];
-int device_ptr;
 
 /*****************************************************************************/
 const char *Device_type[8];
