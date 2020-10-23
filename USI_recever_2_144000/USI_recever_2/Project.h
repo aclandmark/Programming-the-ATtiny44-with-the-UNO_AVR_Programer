@@ -1,5 +1,26 @@
 
-//Baud rate set for 38400: replace 38400 with wanted baud rate
+long Baud_rate = 115200;
+char Pre_scaler;
+long Rx_clock;
+long Tx_clock;
+
+#define set_USI_clocks \
+Tx_clock = 8000000/Baud_rate;\
+switch(Baud_rate){\
+	case 9600:\
+	case 1920:		Rx_clock = Tx_clock; Pre_scaler = 2;break;\
+	case 38400:		Rx_clock = Tx_clock; Pre_scaler = 1;break;\
+	case 57600:		Rx_clock = Tx_clock - 5; Pre_scaler = 1;break;\
+	case 76800:		Rx_clock = Tx_clock - 3; Pre_scaler = 1;break;\
+	case 115200:	Rx_clock = Tx_clock - 3; Pre_scaler = 1;break;\
+	case 128000:	Rx_clock = Tx_clock; Pre_scaler = 1;break;\
+	}
+
+#define Start_clock \
+TCCR0B = Pre_scaler;
+
+
+
 
 #define TIFR0				TIFR
 #define TCNT0				TCNT0L
@@ -44,11 +65,24 @@ DDRA |= (1 << DDA5);
 !(PINA & (1 << PA6))
 *************************************************************************/
 
-#define Tx_clock						Tx_clock_256000
-#define Rx_clock						Rx_clock_256000
-#define Start_clock						Start_clock_256000
+/*#define Tx_clock						Tx_clock_38400
+#define Rx_clock						Rx_clock_38400
+#define Start_clock						Start_clock_38400
+*/
+
+
+
 
 #include "../Resources/USI_header.h"
 #include "../Resources/USI_subroutines.c"
+#include "../Resources/IO_subroutines.c"
+
+const char message_1[] PROGMEM = "Program running on ";
+const char message_2[] PROGMEM = "\r\nEcho single keypresses: return to escape.\r\n";
+const char message_3[] PROGMEM = "\r\nSend String to the USI\r\n";
+const char message_4[] PROGMEM = "\r\nNo text!\r\n";
+const char message_5[] PROGMEM = "\r\nReading strings.";
+const char message_6[] PROGMEM = "\r\nString number? 0 to exit";
+const char message_7[] PROGMEM = "\r\nNo string!\r\n";
 
 
