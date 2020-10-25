@@ -75,7 +75,7 @@ void String_from_USI (unsigned char* string)						//Receive string from PC
 	fetch_char;														//Detects 1 start bit, 8 data bits and ONE stop bit
 	string[0] = keypress;
 	for(int n = 1; n <= 45; n++)									//Max permissible string length 44 chars
-	{USICR = 0;														//Reset USI
+	{USICR = 0;	///////////////////////////////////													//Reset USI
 	
 	while(DI_paused && (++p));
 	
