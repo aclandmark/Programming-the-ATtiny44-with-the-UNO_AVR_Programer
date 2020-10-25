@@ -34,9 +34,9 @@
 
 
 
-#define set_USI_ports_to_WPU \
-DDR_USI &= (~((1 << USCK_pin) | (1 << DO_pin) | (1 << DI_pin)));\
-PORT_USI |= (1 << USCK_pin) | (1 << DO_pin) | (1 << DI_pin);
+//#define set_USI_ports_to_WPU \
+//DDR_USI &= (~((1 << USCK_pin) | (1 << DO_pin) | (1 << DI_pin)));\
+//PORT_USI |= (1 << USCK_pin) | (1 << DO_pin) | (1 << DI_pin);
 
 #define WPU_on_DI_pin \
 DDR_USI &= (!(1 << DI_pin));\
