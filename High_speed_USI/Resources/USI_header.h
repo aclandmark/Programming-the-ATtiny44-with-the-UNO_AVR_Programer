@@ -1,34 +1,35 @@
 
 
-#include <avr/io.h>
-#include <stdlib.h>
-#include <avr/interrupt.h>
-#include <avr/wdt.h>
-#include <avr/eeprom.h>
-
-
-/**********************************************************************************************************************/
-#define T0_delay_5ms 5,220
-#define T1_delay_4sec 5,0x85F7
-#define T1_delay_500ms 5,0xF0BE
-#define T1_delay_250ms 5,0xF85F
-#define T1_delay_50ms 3, 0xCF31
-#define T1_delay_100ms 3, 0x9E62
 
 
 /********************************************************************************************************************/
+char Char_from_flash(int);
+void Determine_device_type(void);
+void set_up_target_parameters(void);
+unsigned char string_counter(int);
+void print_string_num(int, int);
+
 unsigned char ReverseByte (unsigned char);
 void Initialise_USI_Tx (void);
-void Tx_data_byte(unsigned char);							//Transmit single characters
+void Char_to_USI(unsigned char);							//Transmit single characters
 unsigned char Char_from_USI (char);							//Receive single characters as typed in at keyboard						
 void String_from_USI (unsigned char*);						//Receive strings (were there is no pause between characters)
 void newline(void);
 void String_to_USI(const char*);							//The equivalent of sendString
 void Echo_string(unsigned char*);							//Echo string received from keyboard
 char wait_for_return_key(void);
-char isCharavailable (int m);
-/**********************************************************************************************************************/
+char isCharavailable (int);
 
+int Num_from_KBD(void);
+char decimal_digit (char);
+void Flash_String_to_USI(const char*);
+
+
+
+/**********************************************************************************************************************/
+volatile char Prog_mem_address_H, Prog_mem_address_L;
+volatile char Flash_readout;
+int char_counter;
 
 int EEP_MAX = 0x2000;
 int sig_byte_2, sig_byte_3;
@@ -37,97 +38,73 @@ unsigned int FlashSZ;
 char User_response;
 unsigned char OSCCAL_DV;
 
-//unsigned char Rx_clock = 90;
-//unsigned char Tx_clock = 90;
+unsigned char line_length = 0;
+char next_char;
+
 
 /**********************************************************************************************************************/
-
-///2560: works for polling: Theoretical value is 31			Tested OK
-#define Tx_clock_256000						33									
+//256000: Theoretical value is 31			(Always use empirical values)
+#define Tx_clock_256000						33
 #define Rx_clock_256000						29
 #define Start_clock_256000					TCCR0B = (1 << CS00);
-#define Half_Rx_clock_256000				14
+#define Half_Rx_clock_256000				15
 
 
-///144000: works for polling: Theoretical value is 55		Tested OK
-#define Tx_clock_144000						58	
-#define Rx_clock_144000						53
+//144000: Theoretical value is 55			(Theoretical values always OK)
+#define Tx_clock_144000						55			//58 (empirical value)
+#define Rx_clock_144000						55			//53
 #define Start_clock_144000					TCCR0B = (1 << CS00);
+#define Half_Rx_clock_144000				27			//26
 
 
-
-///128000 works for polling: Theoretical value is 62		Tested OK
-#define Tx_clock_128000						64
-#define Rx_clock_128000						62
+//128000: Theoretical value is 62			(Theoretical values always OK)
+#define Tx_clock_128000						62		//64
+#define Rx_clock_128000						62		//62
 #define Start_clock_128000					TCCR0B = (1 << CS00);
+#define Half_Rx_clock_128000				31		//31
 
 
-
-///115200: works for polling: Theoretical value is 69		Tested OK
-#define Tx_clock_115200						68					
-#define Rx_clock_115200						66						
+//115200: Theoretical value is 69			(Empirical values needed for strings from keyboard)
+#define Tx_clock_115200						69		//68
+#define Rx_clock_115200						66
 #define Start_clock_115200					TCCR0B = (1 << CS00);
+#define Half_Rx_clock_115200				33
 
 
-
-///76800: works for polling: Theoretical value is 105		Tested OK
-#define Tx_clock_76800						106			
-#define Rx_clock_76800						102					
+//76800: Theoretical value is 105			(Theoretical values always OK)
+#define Tx_clock_76800						105			//106
+#define Rx_clock_76800						105			//102
 #define Start_clock_76800					TCCR0B = (1 << CS00);
+#define Half_Rx_clock_76800					52			//51
 
 
-
-///57600: works for polling: Theoretical value is 139		Tested OK
-#define Tx_clock_57600						138		
-#define Rx_clock_57600						134	
+//57600: Theoretical value is 139			(Theoretical values always OK)
+#define Tx_clock_57600						139			//138
+#define Rx_clock_57600						139			//134
 #define Start_clock_57600					TCCR0B = (1 << CS00);
-	
-	
-	
-///38400: works for polling: Theoretical value is 208		Tested OK
-#define Tx_clock_38400						210													
-#define Rx_clock_38400						206	
+#define Half_Rx_clock_57600					69			//67
+
+
+//38400: Theoretical value is 208			(Theoretical values always OK)
+#define Tx_clock_38400						208		//210
+#define Rx_clock_38400						208		//206
 #define Start_clock_38400					TCCR0B = (1 << CS00);
+#define Half_Rx_clock_38400					104		//103
 
-
-///19200: works for polling: Theoretical value is 416 (52 x 8)		Tested OK
-#define Tx_clock_19200						52		
-#define Rx_clock_19200						50		
+//19200: Theoretical value is  416 (52 x 8)	(Theoretical values always OK)
+#define Tx_clock_19200						52			//52
+#define Rx_clock_19200						52			//50
 #define Start_clock_19200					TCCR0B = (1 << CS01);
+#define Half_Rx_clock_19200					26			//25
 
-
-///9600: works for polling: Theoretical value is 833 (104 X 8)		Tested OK
-#define Tx_clock_9600						106		
-#define Rx_clock_9600						102
+//9600: Theoretical value is 833 (104 X 8)	(Theoretical values always OK)
+#define Tx_clock_9600						104		//106
+#define Rx_clock_9600						104		//102
 #define Start_clock_9600					TCCR0B = (1 << CS01);
+#define Half_Rx_clock_9600					52		//51
 
 
-#define receiveBit \
-while (!(TIFR0 & (1 << OCF0A)));\
-USICR |= (1 << USICLK);\
-TIFR0 = 0xFF;\
-OCR0A +=  Rx_clock;
 
-
-#define transmitBit \
-while (!(TIFR0 & (1 << OCF0A)));\
-USICR |= (1 << USICLK);\
-TIFR0 = 0xFF;\
-OCR0A +=  Tx_clock;
-
-
-/***********************************************************************/
-
-#define fetch_char \
-Start_clock;\
-OCR0A = Half_Rx_clock;\
-receiveBit;receiveBit;receiveBit;receiveBit;\
-receiveBit;receiveBit;receiveBit;receiveBit;\
-receiveBit;\
-keypress =  USIDR;\
-receiveBit;\
-TCCR0B = 0;\
-TCNT0 = 0;
 
 
 /***********************************************************************/
@@ -162,7 +139,8 @@ MCUCR &= (~(1 << PUD));\
 DDRA = 0;\
 PORTA = 0xFF;\
 DDRB = 0;\
-PORTB = 0xFF;
+PORTB = 0xFF;\
+USIPP |= 1 << USIPOS;
 
 
 #define cal_device \
