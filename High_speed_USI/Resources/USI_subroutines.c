@@ -1,4 +1,39 @@
 
+#define receiveBit \
+while (!(TIFR0 & (1 << OCF0A)));\
+USICR |= (1 << USICLK);\
+TIFR0 = 0xFF;\
+OCR0A +=  Rx_clock;
+
+/*
+Wait for output compare match flag
+Clock the USI
+Clear the flag
+Increment the Output compare register
+*/
+
+
+#define transmitBit \
+while (!(TIFR0 & (1 << OCF0A)));\
+USICR |= (1 << USICLK);\
+TIFR0 = 0xFF;\
+OCR0A +=  Tx_clock;
+
+
+/***********************************************************************/
+
+#define fetch_char \
+Start_clock;\
+OCR0A = Half_Rx_clock;\
+receiveBit;receiveBit;receiveBit;receiveBit;\
+receiveBit;receiveBit;receiveBit;receiveBit;\
+receiveBit;\
+keypress =  USIDR;\
+receiveBit;\
+TCCR0B = 0;\
+TCNT0 = 0;
+
+
 
 unsigned char ReverseByte (unsigned char x) {
 	x = ((x >> 1) & 0x55) | ((x << 1) & 0xAA);
@@ -12,7 +47,7 @@ return x;}
 void Initialise_USI_Tx (void)
 {		
 	USICR = 0;										//Reset USI
-	OCR0A = Tx_clock;
+	OCR0A = Tx_clock;								//Initialise the Output compare register
 	TIFR0 = 0xFF;									//Clear spurious interrupts
 	TCNT0 = 0;										//Clear TCNT0
 	USICR |= (1 << USIWM0);							//Select USI 3-wire mode
@@ -24,7 +59,7 @@ USISR = 0xFF;}										//Clear spurious interrupt flags
 
 
 /**************************************************************************************************************/
-void Tx_data_byte(unsigned char Txdata){				//USI already initialised for transmit by default
+void Char_to_USI(unsigned char Txdata){				//USI already initialised for transmit by default
 	
 	Txdata = ReverseByte(Txdata);
 	
@@ -47,14 +82,13 @@ unsigned char Char_from_USI (char timeout)				//Receive char
 {int p = 8000;											//Time out variable
 	unsigned char keypress;
 	
-	 WPU_on_DO_pin;
+	WPU_on_DO_pin;
 	if (timeout)										//Timeout required
-	while (DI_paused && (p--));					//Wait here for start bit or timeout
+	while (DI_paused && (p--));							//Wait here for start bit or timeout
 	else
-	while (DI_paused);								//Or just wait indefinitely for start bit
+	while (DI_paused);									//Or just wait indefinitely for start bit
 	if(start_bit){
 		fetch_char;
-		
 	keypress = ReverseByte(keypress);}
 	else keypress = 0;									//Timeout occurred
 	Initialise_USI_Tx ();								//Leave USI ready to transmit char
@@ -71,66 +105,22 @@ void String_from_USI (unsigned char* string)						//Receive string from PC
 	
 	 WPU_on_DO_pin;
 		
-	while(DI_paused);
+	while(DI_paused);												//Wait for start bit of first character
 	fetch_char;														//Detects 1 start bit, 8 data bits and ONE stop bit
 	string[0] = keypress;
-	for(int n = 1; n <= 45; n++)									//Max permissible string length 44 chars
-	{USICR = 0;	///////////////////////////////////													//Reset USI
-	
+	for(int n = 1; n < (buffer_size); n++)							//Max permissible string length set by user
+	{
 	while(DI_paused && (++p));
-	
 	if(start_bit)
-		
 		{fetch_char;
-		string[n] = keypress;
-		}													//Clear TCNT0
+		string[n] = keypress;}
 	
 	else{string[n] = '\0';											//receiver times out: terminate string
 	break;}}
 	
-	for(int n = 0; n <= 45; n++)
+	for(int n = 0; n < (buffer_size); n++)
 	{if (string[n]){string[n] = ReverseByte(string[n]);}
 		else break;}
 	Initialise_USI_Tx ();}											//Leave USI ready to transmit char
 
 
-
-/******************************************************************************************************/
-void newline(void){String_to_USI ("\r\n");}
-
-
-
-/*******************************************************************************************************/
-void String_to_USI(const char* s){									//Send predefined string to PC
-	int i = 0;
-	while(i < 200){
-		if(s[i] == '\0') break;
-	Tx_data_byte(s[i++]);} }
-	
-
-	
-	
-/*******************************************************************************************************/
-	void Echo_string(unsigned char* s){								//Send variable string to PC
-		int i = 0;
-		while(i < 200){
-			if(s[i] == '\0') break;
-		Tx_data_byte(s[i++]);} }
-		
-		
-		
-/******************************************************************************************************/
-		char wait_for_return_key(void){								//Keep receiving keypresses until the return key is pressed
-			char keypress;
-			keypress = Char_from_USI (0);							//Wait indefinitely
-			if((keypress == '\r') || (keypress == '\n')){			//If carriage return
-			Char_from_USI (1);keypress = '\r';}						//Ignore companion char if present
-		return keypress;}
-
-
-
-/******************************************************************************************************/
-char isCharavailable (int m){								//Wait for keypress with a timeout
-	char keypress = 0;										//Return 0 is there is no keypress
-	while (!(keypress = Char_from_USI(1)) && m--);
-return keypress;}
