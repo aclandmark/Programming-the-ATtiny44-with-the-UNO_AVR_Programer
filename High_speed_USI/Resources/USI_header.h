@@ -64,7 +64,7 @@ char next_char;
 #define Half_Rx_clock_128000				31		//31
 
 
-//115200: Theoretical value is 69			(Empirical values needed for strings from keyboard)
+//115200: Theoretical value is 69			(Empirical Rx values needed for strings from keyboard)
 #define Tx_clock_115200						69		//68
 #define Rx_clock_115200						66
 #define Start_clock_115200					TCCR0B = (1 << CS00);
@@ -78,11 +78,11 @@ char next_char;
 #define Half_Rx_clock_76800					52			//51
 
 
-//57600: Theoretical value is 139			(Theoretical values always OK)
+//57600: Theoretical value is 139			(Empirical RX values needed for strings from keyboard)
 #define Tx_clock_57600						139			//138
-#define Rx_clock_57600						139			//134
+#define Rx_clock_57600						134			//134
 #define Start_clock_57600					TCCR0B = (1 << CS00);
-#define Half_Rx_clock_57600					69			//67
+#define Half_Rx_clock_57600					67			//67
 
 
 //38400: Theoretical value is 208			(Theoretical values always OK)
