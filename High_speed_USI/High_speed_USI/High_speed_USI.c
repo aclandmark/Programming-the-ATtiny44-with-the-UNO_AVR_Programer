@@ -11,6 +11,10 @@
 	Then press "R"
 	
 	Note: for ATtiny 861 and 461 devices pins 18, 19 and 20 are used for the USI port. 
+	
+	This program uses the compiler to save strings to flash.
+	These share space also used by text files saved to flash and the maximum size
+	of the text files must be reduced appropriately.
 	*/
 	
 	
