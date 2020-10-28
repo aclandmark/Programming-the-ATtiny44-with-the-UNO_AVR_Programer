@@ -10,19 +10,13 @@ long compute_error(char Num_Av, char sign)
 	TCNT1_sum = 0;
 	TCCR1B = 0;															//Ensure T1 is halted
 	TCNT1 = 0;															//clear Timer 1
-	GIFR |= 1 << PCIF0;													//Clear spurious interrupts
-	GIMSK |= 1 << PCIE0;	//1											//Set Pin change interrupt
-	set_PCI_mask_on_SCL;	//2												//Set mask on clock pin
-	TIMSK0 |= (1 << OCIE1A); //861											//Set Timer 1 Interrupt on output compare
-	//TIMSK1 |= (1 << OCIE1A); //84	
+	enable_PCI_on_SCK_pin;
+	set_PCI_mask_on_SCK;	
+	Enable_Timer_1_Interrupt;
 	while (int_counter < Num_Av);										//Pause here for interrupts: Average the result over several 32.768mS periods
-	
-	GIMSK &= (~(1 << PCIE0));	//1										//Measurement complete: Reset registers
-	clear_PCI_mask_on_SCL;		//2
-	TIMSK0 &= (~(1 << OCIE1A));	//861				//Disable Timer 1 interrupt
-	
-	//TIMSK1 &= (~(1 << OCIE1A));	//84
-	
+	disable_PCI_on_SCK_pin;
+	clear_PCI_mask_on_SCK;	
+	Disable_Timer_1_Interrupt;
 	error = error_sum/Num_Av;											//Obtain average result
 	if (!(sign) && error < 0) error = error * (-1);						//Set sign if required
 	return error;
