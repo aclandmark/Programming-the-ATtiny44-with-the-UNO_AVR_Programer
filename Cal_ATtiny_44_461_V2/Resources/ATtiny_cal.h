@@ -19,25 +19,30 @@
 
 /***********************************************************************/
 unsigned char ReverseByte (unsigned char);
-void Initialise_USI_Tx (void);
 void Char_to_USI(unsigned char);
+void Initialise_USI_Tx (void);
 unsigned char Char_from_USI (char);
+
+long compute_error(char, char);
+
 void String_to_USI(const char*);
 void NumericString_to_PC(unsigned char*);
 void SBtoAL(unsigned char*, long, char);
 void Num_to_PC(char, long);
 
-long compute_error(char, char);
-
+void newline(void);
+void String_to_USI(const char*);
+void Flash_String_to_USI(const char*);
+void Num_to_PC(char, long);
+void SBtoAL(unsigned char*, long, char);
+void NumericString_to_PC(unsigned char*);
 void Timer_T0_sub(char, unsigned char);
-void Initialise_T0(void);
 
 void save_cal_values(unsigned char );
 void printout_cal_values(void);
 
 
 /***********************************************************************/
-unsigned char Txdata;
 volatile long error_sum;
 volatile char char_transmitted;
 volatile char char_received;
@@ -49,9 +54,6 @@ int EE_size;
 unsigned int FlashSZ;
 
 unsigned char OSCCAL_DV;
-
-//unsigned char Rx_clock = 60;						//used to step through OCR0A values to determine optimum settings
-//unsigned char Tx_clock = 90;
 
 
 /***********************************************************************/
@@ -124,7 +126,7 @@ PORTA = 0xFF;\
 DDRB = 0;\
 PORTB = 0xFF;\
 USIPP |= 1 << USIPOS;\
-clear_PCI_mask_on_SCL;				//defaults to set
+clear_PCI_mask_on_SCK;				//defaults to set
 
 
 /*****************************************************************************/
