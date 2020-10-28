@@ -9,48 +9,58 @@
 
 
 
-/******Use these definitions for the ATtiny 461 familay of devices*********/
+/******Use these definitions for the ATtiny 461 familay of devices*********
 
-#define	TCNT0						TCNT0L
-#define	TIFR0						TIFR
-#define	WDTCSR						WDTCR
-#define	PCIF0						PCIF
-#define TIMSK0						TIMSK
-#define TIFR1						TIFR
-#define PCINT0_vect					PCINT_vect
-#define TIM1_COMPA_vect				TIMER1_COMPA_vect
-#define TIM0_COMPA_vect				TIMER0_COMPA_vect
+#define	TCNT0							TCNT0L
+#define	TIFR0							TIFR
+#define	WDTCSR							WDTCR
+#define	PCIF0							PCIF
+#define TIMSK0							TIMSK
+#define TIFR1							TIFR
+#define PCINT0_vect						PCINT_vect
+#define TIM1_COMPA_vect					TIMER1_COMPA_vect
+#define TIM0_COMPA_vect					TIMER0_COMPA_vect
 
-#define set_PCI_mask_on_SCL			PCMSK1	= (1 << PCINT10)
-#define clear_PCI_mask_on_SCL		PCMSK1 &= (~(1 << PCINT10))
-#define calibration_active			PCMSK1 & (1 << PCINT10)
-#define set_PCI_mask_on_DI			PCMSK0	= (1 << PCINT0)
-#define clear_PCI_mask_on_DI		PCMSK0	&= (~(1 << PCINT0))
-#define Enable_PCI_on_DI_pin		GIMSK |= 1 << PCIE1;
-#define Disable_PCI_on_DI_pin		GIMSK &= (~(1 << PCIE1));
+#define set_PCI_mask_on_SCK				PCMSK1	= (1 << PCINT10)					//Used to calibrate internal clock
+#define clear_PCI_mask_on_SCK			PCMSK1 &= (~(1 << PCINT10))
+#define calibration_active				PCMSK1 & (1 << PCINT10)
 
-#define prescaller_setting			0x44
+#define set_PCI_mask_on_DI				PCMSK0	= (1 << PCINT0)						//Used to detect start bit
+#define clear_PCI_mask_on_DI			PCMSK0	&= (~(1 << PCINT0))
 
-#define DI_pin						0
-#define DO_pin						1
-#define USCK_pin					2
-#define setup_IO					setup_IO_461
-#define DDR_USI						DDRA
-#define PIN_USI						PINA
-#define PORT_USI					PORTA
-/***************************************************************************/
+#define Enable_PCI_on_DI_pin			GIFR |= 1 << PCIF; GIMSK |= 1 << PCIE1;
+#define Disable_PCI_on_DI_pin			GIMSK &= (~(1 << PCIE1));
+
+#define Enable_Timer_1_Interrupt		TIMSK |= (1 << OCIE1A);
+#define Disable_Timer_1_Interrupt		TIMSK &= (~(1 << OCIE1A));
+
+#define prescaller_setting				0x44
+
+#define DI_pin							0
+#define DO_pin							1
+#define USCK_pin						2
+#define setup_IO						setup_IO_461
+#define DDR_USI							DDRA
+#define PIN_USI							PINA
+#define PORT_USI						PORTA
+***************************************************************************/
 
 
 
-/******Use these definitions for the ATtiny 44 familay of devices*********
+/******Use these definitions for the ATtiny 44 familay of devices*********/
 
-#define set_PCI_mask_on_SCL			PCMSK0	= (1 << PCINT4)
-#define clear_PCI_mask_on_SCL		PCMSK0 &= (~(1 << PCINT4))
+#define set_PCI_mask_on_SCK			PCMSK0	= (1 << PCINT4)							//Used to calibrate internal clock
+#define clear_PCI_mask_on_SCK		PCMSK0 &= (~(1 << PCINT4))
 #define calibration_active			PCMSK0 & (1 << PCINT4)
-#define set_PCI_mask_on_DI			PCMSK0	= (1 << PCINT6)
+
+#define set_PCI_mask_on_DI			PCMSK0	= (1 << PCINT6)							//Used to detect start bit
 #define clear_PCI_mask_on_DI		PCMSK0	&= (~(1 << PCINT6))
-#define Enable_PCI_on_DI_pin		GIMSK |= 1 << PCIE0;
-#define Disable_PCI_on_DI_pin		GIMSK &= (~(1 << PCIE0));
+
+#define Enable_PCI_on_DI_pin		enable_PCI_on_SCK_pin;
+#define Disable_PCI_on_DI_pin		disable_PCI_on_SCK_pin;
+
+#define Enable_Timer_1_Interrupt		TIMSK1 |= (1 << OCIE1A);
+#define Disable_Timer_1_Interrupt		TIMSK1 &= (~(1 << OCIE1A));
 
 #define prescaller_setting			2
 
@@ -61,7 +71,11 @@
 #define DDR_USI						DDRA
 #define PIN_USI						PINA
 #define PORT_USI					PORTA
-*******************************************************************************/
+/*******************************************************************************/
+
+
+#define enable_PCI_on_SCK_pin		GIFR |= 1 << PCIF0; GIMSK |= 1 << PCIE0;
+#define disable_PCI_on_SCK_pin		GIMSK &= (~(1 << PCIE0));
 
 
 
