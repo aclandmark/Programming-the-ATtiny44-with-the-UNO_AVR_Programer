@@ -7,8 +7,6 @@ return x;}
 
 
 
-
-
 void Char_to_USI(unsigned char Txdata){					//Transmit data
 	
 	Txdata = ReverseByte(Txdata);
@@ -61,9 +59,7 @@ unsigned char Char_from_USI (char timeout)						//zero: wait indefinitively; one
 		
 	set_USI_ports_to_WPU;
 	USICR = 0;													//Reset USI
-	GIFR |= 1 << PCIF0;											//clear spurious interrupts on DI pin
 	Enable_PCI_on_DI_pin;
-	
 	set_PCI_mask_on_DI;
 	
 	if (timeout)
