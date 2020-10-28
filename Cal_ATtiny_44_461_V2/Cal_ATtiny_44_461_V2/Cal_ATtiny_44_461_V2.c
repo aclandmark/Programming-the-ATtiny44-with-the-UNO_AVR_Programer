@@ -9,8 +9,11 @@ The USI routines used in this project are taken from Atmel Application note AVR3
 source code.  See http://becomingmaker.com/usi-serial-uart-attiny85/ for the links.
 (Note: The author of this web page is also an Osborne, a different Osborne however from the one posting this project).   
  
-While the target device is being programmed its USI Rx/Tx lines must be temporarily disconnected.
-They must then be reconnected as user input is required to complete the calibration process.
+In the ATtiny44/84 the programming port shares pins with the USI. While the ATtiny44/84 target device is being 
+programmed its USI Rx/Tx lines must be temporarily disconnected.
+
+The ATtiny 461/861 however offers the option to select USI pins which are not also used by the programming interface
+This option is selects here and the USI can be left permanently connected. 
 
 Cut and paste could be used to developed cut down versions of this program that would run faster and 
 more efficiently and even do without user input. Such a version could be  could be used to program 24 and 261 devices
@@ -47,7 +50,7 @@ int main (void)
 	OSCCAL_WV = OSCCAL;													//Value automatically selected
 	OSCCAL_UV = OSCCAL;													//Value selected by user
 	OSCCAL = 0xF0;
-	while (OSCCAL>= 0x0F){//OSCCAL;
+	while (OSCCAL>= 0x0F){
 		if(!(OSCCAL%3))Char_to_USI('.');								//Print . while stepping through OSCCAL values
 		error = compute_error(1,0);										//All error values are positive
 		if(error <1000) OSCCAL_WV = OSCCAL;
