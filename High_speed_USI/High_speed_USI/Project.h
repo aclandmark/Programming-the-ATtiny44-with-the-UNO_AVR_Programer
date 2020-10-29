@@ -12,26 +12,26 @@
 
 //Baud rate set for 38400: replace 38400 with wanted baud rate
 
-#define Tx_clock						Tx_clock_128000
-#define Rx_clock						Rx_clock_128000
-#define Start_clock						Start_clock_128000
-#define Half_Rx_clock					Half_Rx_clock_128000
+#define Tx_clock						Tx_clock_38400
+#define Rx_clock						Rx_clock_38400
+#define Start_clock						Start_clock_38400
+#define Half_Rx_clock					Half_Rx_clock_38400
 
 char buffer_size = 47;					//User can set this value to maximum string length to be sent from PC
 
 
 //Settings for ATtiny44 and 84 devices
-/******************************************************************************************/
+/******************************************************************************************
 #define DI_pin				6
 #define DO_pin				5
 #define USCK_pin			4
 #define setup_IO			setup_IO_44
-/******************************************************************************************/
+******************************************************************************************/
 
 
 
 //Settings for ATtiny461 and 861 devices
-/******************************************************************************************
+/******************************************************************************************/
 #define TIFR0				TIFR
 #define TCNT0				TCNT0L
 #define WDTCSR				WDTCR
@@ -40,7 +40,7 @@ char buffer_size = 47;					//User can set this value to maximum string length to
 #define DO_pin				1
 #define USCK_pin			2
 #define setup_IO			setup_IO_461
-******************************************************************************************/
+/******************************************************************************************/
 
 
 
