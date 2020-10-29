@@ -43,6 +43,8 @@ char next_char;
 
 
 /**********************************************************************************************************************/
+//Theoretical clock value = 8,000,000/Baud rate
+
 //256000: Theoretical value is 31			(Always use empirical values)
 #define Tx_clock_256000						33
 #define Rx_clock_256000						29
