@@ -1,10 +1,12 @@
 	/*
 	Basic Project that uses the High speed USI to communicate with a PC via a USB bridge.
 	Recommendation for exploring the operation of this code:
-	Use the UNO_AVR_Programmer_V2 to calibrate a target device.
-	Then use it to upload High_speed_USI.hex to the target.
-	At the user prompt "Text_file? y or n" press n.
-	Use text in Project.h to change the baud rate if required.
+	Use the UNO_AVR_Programmer_V2 to program a target device.
+	First upload "Cal_ATtiny_44_461_V2.hex" and calibrate the target.
+	Then upload "High_speed_USI.hex" to the target.
+	In each case open Project.h and check that the correct device type is selected
+	and at user prompt "Text_file? y or n" press n.
+	
 	At the "R    R   R......." prompt press "r" (may need pressing twice).
 	Send individual keypresses or strings as prompted.
 	If this works try uploading a text file at the "Text_file? y or n".
@@ -49,8 +51,7 @@
 		Char_to_USI(Keypress);}
 								
 		Flash_String_to_USI(message_3);										//\r\nSend strings to USI\r\n
-		
-		
+			
 		text_num = 10;						
 		while(text_num--){
 			String_from_USI (char_buffer);									//Use Bray++ to assemble a string
