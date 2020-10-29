@@ -36,7 +36,7 @@ void String_to_USI(const char* s){									//Send predefined string to PC
 
 		/******************************************************************************************************/
 		char isCharavailable (int m){								//Wait for keypress with a timeout
-			char keypress = 0;										//Return 0 is there is no keypress
+			char keypress = 0;										//Return 0 if there is no keypress
 			while (!(keypress = Char_from_USI(1)) && m--);
 		return keypress;}
 
