@@ -1,6 +1,6 @@
 
 /*
-Program designed to calibrate the ATtiny  44 and 84 461 and 861 devices.
+Version 2 of program designed to calibrate the ATtiny  44 and 84 461 and 861 devices.
 "UNO_AVR_Programmer_V2" code running on the UNO is used to program the ATtiny devices.
 A 65.536mS square wave on the UNO clock programming pin is used to calibrate them.
 
@@ -40,11 +40,7 @@ int main (void)
 	
 	sei();																//Required by USI and cal subroutines
 	
-		
-
-	Char_from_USI(0);													//Pause while Rx/Tx lines are connected
-	
-	
+	Char_from_USI(0);													//Wait for a keypress
 	
 	OSCCAL_DV = OSCCAL;													//Default OSCCAL
 	OSCCAL_WV = OSCCAL;													//Value automatically selected
@@ -60,11 +56,11 @@ int main (void)
 	
 	newline();
 	set_device_type_and_memory_size;									//Confirm device type
-	Flash_String_to_USI(message_1);
+	Flash_String_to_USI(message_1);										//\r\n\r\nCalibrating ATtiny
 	String_to_USI (Device_type[device_ptr]);
 	if (device_ptr == 7)while(1);										//Device not recognized: Halt
 	
-	Flash_String_to_USI(message_2);
+	Flash_String_to_USI(message_2);										//\r\nDV/WV, previous OSCCAL values  
 	
 	Num_to_PC(10, OSCCAL_DV);  String_to_USI("  ");
 	Num_to_PC(10, OSCCAL_WV);String_to_USI("  ");
@@ -87,7 +83,7 @@ int main (void)
 		Num_to_PC(10, error);
 	newline();}
 	
-	Flash_String_to_USI(message_3);										//User chooses actual value for OSCCAL
+	Flash_String_to_USI(message_3);										//User cal? Enter 1 to F then x if OK\r\n
 	
 	
 	while(1){
@@ -100,9 +96,7 @@ int main (void)
 	}
 	save_cal_values(OSCCAL_UV);
 	printout_cal_values();
-	
-	
-	while(1)Char_to_USI(Char_from_USI (0));
+
 	while(1);
 return 1;}
 
@@ -137,13 +131,11 @@ ISR (PCINT0_vect){													//Pin change interrupt on DI pin or SCK pins
 		if (!(TCCR1B)) {
 			TCNT1_sum = 0;
 			TCNT1 = 0;
-			TCCR1B = prescaller_setting;							//1MHz clock
-		}
-		
+			TCCR1B = prescaller_setting;}							//1MHz clock
+	
 		else {TCCR1B = 0; int_counter += 1;
 			error_sum = error_sum + TCNT1_sum - 32768 + TCNT1;
-		}
-	}
+		}}
 	
 	else{															//USI receiver active: start bit detected (PCI on DI pin)
 		if(DI_pin_low)
