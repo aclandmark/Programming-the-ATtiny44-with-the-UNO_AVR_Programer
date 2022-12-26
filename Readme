@@ -17,3 +17,8 @@ A second implementation has therefore also been developed.  In this case all int
 of timer delay can be used and with care a baud rate of 256000 can be obtained.
 The obvious dissadvantage is that when receiving or transmiting data no other proces can be goining on between the interrupts.  It is considered that for a 
 device such as the ATtiny this will rarely be a dissadvantage for many users (certainly not for the author of this posting).
+
+
+Link to AVRfreaks project:
+
+https://github.com/MicrochipTech/avrfreaks-projects/tree/9e6bc971411a2d69374012572b3b6144f2f3f7f2/projects/simple-usi-configuration-provides-uart-function-256000-baud
